@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание пропуска</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Создание пропуска</h1>
+        <form id="absenceForm">
+            <label for="reason">Причина пропуска:</label>
+            <textarea id="reason" name="reason" required></textarea>
+            <label for="document">Прикрепить документ:</label>
+            <input type="file" id="document" name="document">
+            <button type="submit">Создать пропуск</button>
+        </form>
+        <div id="statusMessage"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
