@@ -2,6 +2,8 @@ using AttendanceTracker.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://*:5000");
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
