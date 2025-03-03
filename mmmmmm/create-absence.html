@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание пропуска</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Создание пропуска</h1>
+        <form id="createAbsenceForm">
+            <label for="subject">Предмет:</label>
+            <input type="text" id="subject" name="subject" required>
+
+            <label for="date">Дата:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="reason">Причина пропуска:</label>
+            <textarea id="reason" name="reason" required></textarea>
+
+            <label for="file">Прикрепить файл (например, справку):</label>
+            <input type="file" id="file" name="file">
+
+            <button type="submit">Сохранить пропуск</button>
+        </form>
+        <p><a href="student.html">Вернуться на страницу студента</a></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
