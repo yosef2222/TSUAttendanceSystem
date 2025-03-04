@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.8'
 
 services:
   tsuattendance:
@@ -10,11 +10,15 @@ services:
       - "5000:5000"
     environment:
       - DOTNET_RUNNING_IN_CONTAINER=true
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=AttendanceDB;User=user;Password=password;
     depends_on:
       - db
 
   db:
     image: mysql:5.7
+    container_name: mysql_container
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: AttendanceDB
