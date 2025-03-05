@@ -1,16 +1,41 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using TSUAttendanceSystem.Data;
 using TSUAttendanceSystem.Models;
+using TSUAttendanceSystem.Services;
 using TSUAttendanceSystem.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Set app to listen on port 5000 in Docker
-builder.WebHost.UseUrls("http://*:5000");
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "TSU Attendance System API", Version = "v1" });
+
+    // ✅ Enable JWT Authentication in Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer {your_token_here}'"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            new string[] { }
+        }
+    });
+});
 
 // ✅ Load configuration
 var configuration = builder.Configuration;
@@ -39,6 +64,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // ✅ Dependency injection for authentication services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>(); // Добавьте эту строку
 builder.Services.AddSingleton<JwtService>();
 
 // ✅ Configure JWT authentication
@@ -78,8 +104,5 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// ✅ Health check endpoint
-app.MapGet("/", () => Results.Ok("✅ API is running successfully inside Docker!"));
 
 app.Run();

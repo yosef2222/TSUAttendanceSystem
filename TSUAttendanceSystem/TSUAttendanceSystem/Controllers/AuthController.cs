@@ -1,11 +1,10 @@
-using TSUAttendanceSystem.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TSUAttendanceSystem.Models;
 using TSUAttendanceSystem.Models.Users;
+using TSUAttendanceSystem.Services.Auth;
 
 namespace TSUAttendanceSystem.Controllers;
-
 
 [ApiController]
 [Route("api/[controller]")]
@@ -24,11 +23,13 @@ public class AuthController : ControllerBase
     {
         try
         {
+            // Регистрируем пользователя и получаем токен
             var token = await _authService.Register(request);
             return Ok(new { Token = token });
         }
         catch (InvalidOperationException ex)
         {
+            // Обрабатываем ошибку, если пользователь уже существует
             return BadRequest(ex.Message);
         }
     }
@@ -39,11 +40,13 @@ public class AuthController : ControllerBase
     {
         try
         {
+            // Авторизуем пользователя и получаем токен
             var token = await _authService.Login(loginDto);
             return Ok(new { Token = token });
         }
         catch (UnauthorizedAccessException ex)
         {
+            // Обрабатываем ошибку, если учетные данные неверны
             return Unauthorized(ex.Message);
         }
     }
@@ -52,6 +55,7 @@ public class AuthController : ControllerBase
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
+        // Получаем ID пользователя из токена
         var userIdClaim = User.FindFirst("Id")?.Value;
         if (string.IsNullOrEmpty(userIdClaim))
             return Unauthorized("Invalid token: User ID not found.");
@@ -60,11 +64,13 @@ public class AuthController : ControllerBase
 
         try
         {
+            // Получаем профиль пользователя
             var profile = await _authService.GetProfile(userId);
             return Ok(profile);
         }
         catch (KeyNotFoundException ex)
         {
+            // Обрабатываем ошибку, если пользователь не найден
             return NotFound(ex.Message);
         }
     }
@@ -73,6 +79,7 @@ public class AuthController : ControllerBase
     [HttpPut("profile")]
     public async Task<IActionResult> EditProfile(EditProfileDto request)
     {
+        // Получаем ID пользователя из токена
         var userIdClaim = User.FindFirst("Id")?.Value;
         if (string.IsNullOrEmpty(userIdClaim))
             return Unauthorized("Invalid token: User ID not found.");
@@ -81,11 +88,13 @@ public class AuthController : ControllerBase
 
         try
         {
+            // Редактируем профиль пользователя
             var profile = await _authService.EditProfile(userId, request);
             return Ok(profile);
         }
         catch (KeyNotFoundException ex)
         {
+            // Обрабатываем ошибку, если пользователь не найден
             return NotFound(ex.Message);
         }
     }

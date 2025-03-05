@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TSUAttendanceSystem.Models;
 
+
+
 public class UserDto
 {
     [Required]
@@ -18,4 +20,7 @@ public class UserDto
     [Required]
     [StringLength(100, MinimumLength = 6)]
     public string Password { get; set; }
+
+    [Required(ErrorMessage = "IsStudent field is required.")]
+    public bool IsStudent { get; set; } // Новое поле для выбора, является ли пользователь студентом
 }
