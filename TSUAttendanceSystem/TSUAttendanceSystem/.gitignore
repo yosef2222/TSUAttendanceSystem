@@ -1,0 +1,69 @@
+# ========================
+# .NET Git Ignore File
+# ========================
+
+# Build & compiled files
+bin/
+obj/
+out/
+*.exe
+*.dll
+*.pdb
+*.app
+*.so
+*.dylib
+
+# User-specific files
+*.user
+*.suo
+*.vscode/
+*.vs/
+.idea/
+*.iml
+*.sln.ide
+*.sln.docstates
+*.swp
+*.swo
+
+# NuGet Packages & Dependencies
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.assets.json
+
+# Logs & Debugging
+*.log
+logs/
+**/*.pid
+*.tmp
+
+# Docker & Database Files
+.env
+docker-compose.override.yml
+*.mdf
+*.ldf
+*.sqlite
+*.db
+
+# ASP.NET & EF Migrations
+wwwroot/
+appsettings.Development.json
+appsettings.Local.json
+Migrations/
+
+# Secret & Security Files
+secrets.json
+certificates/
+
+# Rider & JetBrains
+.idea/
+
+# .NET Core Global
+.vscode/
+*.csproj.user
+
+# Ignore publish files
+.publish/
+publish/

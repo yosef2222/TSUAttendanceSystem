@@ -9,5 +9,11 @@ public class User
     public string PasswordHash { get; set; }
     
     public Role Role { get; set; }
+    
+    // 🆕 Student's Absence Requests
+    public List<Request> Requests { get; set; } = new();
+
+    // 🆕 Admins & Deans can review requests
+    public List<Request> ReviewedRequests { get; set; } = new();
 
 }
