@@ -15,7 +15,7 @@ public class JwtService
 
     public JwtService(IConfiguration config)
     {
-        _secret = config["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret is not configured");
+        _secret = config["Jwt:Key"] ?? throw new InvalidOperationException("JWT Secret is not configured");
         _issuer = config["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured");
         _audience = config["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured");
         _tokenLifetimeInHours = int.Parse(config["Jwt:TokenLifetimeInHours"] ?? "1");
