@@ -22,6 +22,40 @@ namespace TSUAttendanceSystem.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("TSUAttendanceSystem.Models.Request", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("AbsenceDateEnd")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("AbsenceDateStart")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("ReviewedById")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewedById");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Requests");
+                });
+
             modelBuilder.Entity("TSUAttendanceSystem.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -77,6 +111,24 @@ namespace TSUAttendanceSystem.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("TSUAttendanceSystem.Models.Request", b =>
+                {
+                    b.HasOne("TSUAttendanceSystem.Models.User", "ReviewedBy")
+                        .WithMany("ReviewedRequests")
+                        .HasForeignKey("ReviewedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TSUAttendanceSystem.Models.User", "Student")
+                        .WithMany("Requests")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ReviewedBy");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("TSUAttendanceSystem.Models.Role", b =>
                 {
                     b.HasOne("TSUAttendanceSystem.Models.User", "User")
@@ -90,6 +142,10 @@ namespace TSUAttendanceSystem.Migrations
 
             modelBuilder.Entity("TSUAttendanceSystem.Models.User", b =>
                 {
+                    b.Navigation("Requests");
+
+                    b.Navigation("ReviewedRequests");
+
                     b.Navigation("Role")
                         .IsRequired();
                 });
