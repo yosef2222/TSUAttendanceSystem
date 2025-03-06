@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using TSUAttendanceSystem.Data;
 using TSUAttendanceSystem.Models;
 using TSUAttendanceSystem.Models.Enums;
-using TSUAttendanceSystem.Services.Auth;
 
 namespace TSUAttendanceSystem.Controllers;
 
@@ -15,14 +14,13 @@ namespace TSUAttendanceSystem.Controllers;
 public class RequestsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly IAuthService _authService;
 
-    public RequestsController(ApplicationDbContext context, IAuthService authService)
+    public RequestsController(ApplicationDbContext context)
     {
         _context = context;
-        _authService = authService;
     }
 
+    // Создание новой заявки
     [Authorize(Roles = "Student, Teacher")]
     [HttpPost]
     public async Task<IActionResult> CreateRequest([FromBody] CreateRequestDto requestDto)
@@ -49,6 +47,7 @@ public class RequestsController : ControllerBase
         return CreatedAtAction(nameof(GetMyRequests), new { id = request.Id }, request);
     }
 
+    // Получение всех заявок текущего пользователя
     [Authorize(Roles = "Student, Teacher")]
     [HttpGet("my")]
     public async Task<IActionResult> GetMyRequests()
@@ -61,11 +60,22 @@ public class RequestsController : ControllerBase
 
         var requests = await _context.Requests
             .Where(r => r.StudentId == userId.Value)
+            .Select(r => new RequestDetailsDto
+            {
+                Id = r.Id,
+                Reason = r.Reason,
+                AbsenceDateStart = r.AbsenceDateStart,
+                AbsenceDateEnd = r.AbsenceDateEnd,
+                Status = r.Status,
+                StudentFullName = r.Student.FullName,
+                ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null
+            })
             .ToListAsync();
 
         return Ok(requests);
     }
 
+    // Получение всех заявок со статусом "Pending" (для администраторов и деканов)
     [Authorize(Roles = "Admin,Dean")]
     [HttpGet("pending")]
     public async Task<IActionResult> GetPendingRequests()
@@ -73,14 +83,26 @@ public class RequestsController : ControllerBase
         var requests = await _context.Requests
             .Where(r => r.Status == RequestStatus.Pending)
             .Include(r => r.Student)
+            .Include(r => r.ReviewedBy)
+            .Select(r => new RequestDetailsDto
+            {
+                Id = r.Id,
+                Reason = r.Reason,
+                AbsenceDateStart = r.AbsenceDateStart,
+                AbsenceDateEnd = r.AbsenceDateEnd,
+                Status = r.Status,
+                StudentFullName = r.Student.FullName,
+                ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null
+            })
             .ToListAsync();
 
         return Ok(requests);
     }
 
-    [Authorize(Roles = "Admin,Dean")]
-    [HttpPut("{id}/review")]
-    public async Task<IActionResult> ReviewRequest(Guid id, [FromBody] ReviewRequestDto reviewDto)
+    // Редактирование даты окончания заявки
+    [Authorize(Roles = "Student, Teacher")]
+    [HttpPut("{id}/edit-end-date")]
+    public async Task<IActionResult> EditRequestEndDate(Guid id, [FromBody] EditRequestEndDateDto requestDto)
     {
         var userId = GetUserId();
         if (userId == null)
@@ -94,18 +116,73 @@ public class RequestsController : ControllerBase
             return NotFound("Request not found.");
         }
 
+        // Проверяем, что заявка принадлежит текущему пользователю
+        if (request.StudentId != userId.Value)
+        {
+            return Forbid("You can only edit your own requests.");
+        }
+
+        // Обновляем дату окончания заявки
+        request.AbsenceDateEnd = requestDto.AbsenceDateEnd;
+
+        // Сбрасываем статус заявки на Pending
+        request.Status = RequestStatus.Pending;
+
+        // Сохраняем изменения в базе данных
+        _context.Requests.Update(request);
+        await _context.SaveChangesAsync();
+
+        return Ok(request);
+    }
+
+    // Редактирование статуса заявки (для администраторов и деканов)
+    [Authorize(Roles = "Admin,Dean")]
+    [HttpPut("{id}/review")]
+    public async Task<IActionResult> ReviewRequest(Guid id, [FromBody] ReviewRequestDto reviewDto)
+    {
+        var userId = GetUserId();
+        if (userId == null)
+        {
+            return Unauthorized("Invalid token: User ID not found or is invalid.");
+        }
+
+        var request = await _context.Requests
+            .Include(r => r.Student)
+            .Include(r => r.ReviewedBy)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (request == null)
+        {
+            return NotFound("Request not found.");
+        }
+
         if (request.Status != RequestStatus.Pending)
         {
             return BadRequest("This request has already been reviewed.");
         }
 
+        // Обновляем статус заявки
         request.Status = reviewDto.Approve ? RequestStatus.Approved : RequestStatus.Rejected;
         request.ReviewedById = userId.Value;
 
         await _context.SaveChangesAsync();
-        return Ok(request);
+
+        // Возвращаем обновленную заявку с именем администратора
+        var result = new RequestDetailsDto
+        {
+            Id = request.Id,
+            Reason = request.Reason,
+            AbsenceDateStart = request.AbsenceDateStart,
+            AbsenceDateEnd = request.AbsenceDateEnd,
+            Status = request.Status,
+            StudentFullName = request.Student.FullName,
+            ReviewedByFullName = request.ReviewedBy?.FullName
+        };
+
+        return Ok(result);
     }
 
+    // Вспомогательный метод для получения ID текущего пользователя
     private Guid? GetUserId()
     {
         var userIdClaim = User.FindFirst("Id")?.Value; // Получаем значение claim "Id"
