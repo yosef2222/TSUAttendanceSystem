@@ -22,6 +22,34 @@ namespace TSUAttendanceSystem.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("TSUAttendanceSystem.Models.FileDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestId");
+
+                    b.ToTable("Files");
+                });
+
             modelBuilder.Entity("TSUAttendanceSystem.Models.Request", b =>
                 {
                     b.Property<Guid>("Id")
@@ -111,6 +139,17 @@ namespace TSUAttendanceSystem.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("TSUAttendanceSystem.Models.FileDocument", b =>
+                {
+                    b.HasOne("TSUAttendanceSystem.Models.Request", "Request")
+                        .WithMany("Files")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Request");
+                });
+
             modelBuilder.Entity("TSUAttendanceSystem.Models.Request", b =>
                 {
                     b.HasOne("TSUAttendanceSystem.Models.User", "ReviewedBy")
@@ -138,6 +177,11 @@ namespace TSUAttendanceSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TSUAttendanceSystem.Models.Request", b =>
+                {
+                    b.Navigation("Files");
                 });
 
             modelBuilder.Entity("TSUAttendanceSystem.Models.User", b =>

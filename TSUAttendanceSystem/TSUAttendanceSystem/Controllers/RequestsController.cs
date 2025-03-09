@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using TSUAttendanceSystem.Data;
 using TSUAttendanceSystem.Models;
 using TSUAttendanceSystem.Models.Enums;
-
 namespace TSUAttendanceSystem.Controllers;
 
 [Authorize]
@@ -20,10 +19,9 @@ public class RequestsController : ControllerBase
         _context = context;
     }
 
-    // Создание новой заявки
     [Authorize(Roles = "Student, Teacher")]
     [HttpPost]
-    public async Task<IActionResult> CreateRequest([FromBody] CreateRequestDto requestDto)
+    public async Task<IActionResult> CreateRequest([FromForm] CreateRequestDto requestDto, [FromForm] List<IFormFile> files)
     {
         var userId = GetUserId();
         if (userId == null)
@@ -43,6 +41,31 @@ public class RequestsController : ControllerBase
 
         _context.Requests.Add(request);
         await _context.SaveChangesAsync();
+
+        // Handle file uploads
+        if (files != null && files.Any())
+        {
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    using var memoryStream = new MemoryStream();
+                    await file.CopyToAsync(memoryStream);
+
+                    var uploadedFile = new FileDocument
+                    {
+                        Id = Guid.NewGuid(),
+                        FileName = file.FileName,
+                        ContentType = file.ContentType,
+                        Data = memoryStream.ToArray(),
+                        RequestId = request.Id
+                    };
+
+                    _context.Files.Add(uploadedFile);
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
 
         return CreatedAtAction(nameof(GetMyRequests), new { id = request.Id }, request);
     }
@@ -76,7 +99,7 @@ public class RequestsController : ControllerBase
     }
 
     // Получение всех заявок со статусом "Pending" (для администраторов и деканов)
-    [Authorize(Roles = "Admin,Dean")]
+    [Authorize(Roles = "Admin, Dean")]
     [HttpGet("pending")]
     public async Task<IActionResult> GetPendingRequests()
     {
@@ -197,5 +220,19 @@ public class RequestsController : ControllerBase
         }
 
         return userId;
+    }
+    
+    [Authorize]
+    [HttpGet("{requestId}/files/{fileId}")]
+    public async Task<IActionResult> GetFile(Guid requestId, Guid fileId)
+    {
+        var file = await _context.Files
+            .Where(f => f.RequestId == requestId && f.Id == fileId)
+            .FirstOrDefaultAsync();
+
+        if (file == null)
+            return NotFound("File not found.");
+
+        return File(file.Data, file.ContentType, file.FileName);
     }
 }

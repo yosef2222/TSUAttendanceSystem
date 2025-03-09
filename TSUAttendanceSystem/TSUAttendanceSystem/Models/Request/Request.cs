@@ -13,4 +13,5 @@ public class Request
     public RequestStatus Status { get; set; } = RequestStatus.Pending;
     public Guid? ReviewedById { get; set; }
     public User? ReviewedBy { get; set; }
+    public List<FileDocument> Files { get; set; } = new();
 }

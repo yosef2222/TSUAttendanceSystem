@@ -12,6 +12,8 @@ public class ApplicationDbContext : DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Request> Requests { get; set; }
+        public DbSet<FileDocument> Files { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,5 +37,12 @@ public class ApplicationDbContext : DbContext
                 .WithMany(u => u.ReviewedRequests)
                 .HasForeignKey(r => r.ReviewedById)
                 .OnDelete(DeleteBehavior.SetNull);
+            
+            modelBuilder.Entity<FileDocument>()
+                .HasOne(f => f.Request)
+                .WithMany(r => r.Files)
+                .HasForeignKey(f => f.RequestId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete files if request is deleted
         }
+        
 }
