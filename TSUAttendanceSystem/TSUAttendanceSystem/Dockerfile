@@ -11,7 +11,7 @@ WORKDIR /src
 RUN dotnet tool install --global dotnet-ef
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
-COPY ["TSUAttendanceSystem.csproj", "./"]
+COPY ["TSUAttendanceSystem/TSUAttendanceSystem.csproj", "./"]
 RUN dotnet restore "./TSUAttendanceSystem.csproj"
 COPY . .
 RUN dotnet build "./TSUAttendanceSystem.csproj" -c Release -o /app/build
