@@ -19,6 +19,7 @@ RUN dotnet restore "./TSUAttendanceSystem.csproj"
 # ✅ Copy the entire project and build
 COPY TSUAttendanceSystem/TSUAttendanceSystem/ ./TSUAttendanceSystem/
 WORKDIR /src/TSUAttendanceSystem
+RUN rm -rf obj bin
 RUN dotnet build "./TSUAttendanceSystem.csproj" -c Release -o /app/build
 
 # ✅ Publish the app
