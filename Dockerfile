@@ -19,12 +19,13 @@ RUN dotnet restore "./TSUAttendanceSystem.csproj"
 # ✅ Copy the entire project and build
 COPY TSUAttendanceSystem/TSUAttendanceSystem/ ./TSUAttendanceSystem/
 WORKDIR /src/TSUAttendanceSystem
+RUN mkdir -p /app/build && chmod -R 777 /app/build
 RUN rm -rf obj bin
 RUN dotnet build "./TSUAttendanceSystem.csproj" -c Release -o /app/build
 
 # ✅ Publish the app
 FROM build AS publish
-RUN dotnet publish "./TSUAttendanceSystem.csproj" -c Release -o /app/publish
+RUN dotnet build "./TSUAttendanceSystem.csproj" -c Release -o /app/build --no-incremental
 
 # ✅ Migration stage: Run migrations before final runtime
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS migration
