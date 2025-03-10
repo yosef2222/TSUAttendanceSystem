@@ -10,7 +10,7 @@ using TSUAttendanceSystem.Services;
 using TSUAttendanceSystem.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseUrls("http://*:5000");
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

@@ -16,31 +16,35 @@ COPY TSUAttendanceSystem/TSUAttendanceSystem/*.csproj ./TSUAttendanceSystem/
 WORKDIR /src/TSUAttendanceSystem
 RUN dotnet restore "./TSUAttendanceSystem.csproj"
 
+# ✅ Clean the build (removes obj and bin directories from the previous build)
+RUN dotnet clean "./TSUAttendanceSystem.csproj"
+
 # ✅ Copy the entire project and build
 COPY TSUAttendanceSystem/TSUAttendanceSystem/ ./TSUAttendanceSystem/
 WORKDIR /src/TSUAttendanceSystem
-RUN mkdir -p /app/build && chmod -R 777 /app/build
-RUN rm -rf obj bin
+
+# ✅ Build the project
 RUN dotnet build "./TSUAttendanceSystem.csproj" -c Release -o /app/build
 
-# ✅ Publish the app
+# ✅ Publish the app (produce a self-contained or framework-dependent app)
 FROM build AS publish
-RUN dotnet build "./TSUAttendanceSystem.csproj" -c Release -o /app/build --no-incremental
+RUN dotnet publish "./TSUAttendanceSystem.csproj" -c Release -o /app/publish
 
 # ✅ Migration stage: Run migrations before final runtime
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS migration
 WORKDIR /app
-COPY --from=publish /app/publish .
-COPY --from=build /root/.dotnet /root/.dotnet
+COPY --from=publish /app/publish .  # Copy the published app files
+COPY --from=build /root/.dotnet /root/.dotnet  # Copy .NET SDK from build stage
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
 # ✅ Apply database migrations
-RUN dotnet ef database update
+RUN dotnet ef database update  # Run database migrations here
 
 # ✅ Final runtime stage (only contains .NET runtime)
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=publish /app/publish .  
+# Copy the published app files
 
-# ✅ Start the API
+# ✅ Start the API (entry point to run the application)
 ENTRYPOINT ["dotnet", "TSUAttendanceSystem.dll"]

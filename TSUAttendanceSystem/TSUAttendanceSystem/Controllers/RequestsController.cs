@@ -82,12 +82,11 @@ public class RequestsController : ControllerBase
     {
         var userId = GetUserId();
         if (userId == null)
-        {
             return Unauthorized("Invalid token: User ID not found or is invalid.");
-        }
 
         var requests = await _context.Requests
             .Where(r => r.StudentId == userId.Value)
+            .Include(r => r.Files) // Include files related to the request
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
@@ -96,7 +95,8 @@ public class RequestsController : ControllerBase
                 AbsenceDateEnd = r.AbsenceDateEnd,
                 Status = r.Status,
                 StudentFullName = r.Student.FullName,
-                ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null
+                ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null,
+                FileIds = r.Files.Select(f => f.Id).ToList() // Get file IDs
             })
             .ToListAsync();
 
@@ -112,6 +112,7 @@ public class RequestsController : ControllerBase
             .Where(r => r.Status == RequestStatus.Pending)
             .Include(r => r.Student)
             .Include(r => r.ReviewedBy)
+            .Include(r => r.Files) // Include files related to the request
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
@@ -120,7 +121,8 @@ public class RequestsController : ControllerBase
                 AbsenceDateEnd = r.AbsenceDateEnd,
                 Status = r.Status,
                 StudentFullName = r.Student.FullName,
-                ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null
+                ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null,
+                FileIds = r.Files.Select(f => f.Id).ToList() // Get file IDs
             })
             .ToListAsync();
 
