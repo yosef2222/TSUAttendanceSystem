@@ -8,7 +8,7 @@ services:
       - "5000:5000"
     environment:
       - DOTNET_RUNNING_IN_CONTAINER=true
-      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=AttendanceDB;User=root;Password=root;SslMode=None
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=AttendanceDB;User=user;Password=password;SslMode=Preferred
     depends_on:
       - db
 
@@ -20,8 +20,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: AttendanceDB
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
     volumes:
