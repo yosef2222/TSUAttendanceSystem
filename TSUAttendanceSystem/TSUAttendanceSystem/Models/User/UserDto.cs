@@ -19,8 +19,9 @@ public class UserDto
 
     [Required]
     [StringLength(100, MinimumLength = 6)]
+    public string Password { get; set; } 
+    
     [RegularExpression(@"^(?=.*\d).+$", ErrorMessage = "Password must contain at least one digit.")]
-    public string Password { get; set; }
 
     [Required(ErrorMessage = "IsStudent field is required.")]
     public bool IsStudent { get; set; }
