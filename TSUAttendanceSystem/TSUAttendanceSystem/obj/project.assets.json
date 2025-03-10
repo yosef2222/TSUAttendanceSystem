@@ -4911,31 +4911,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Yusuf\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "/Users/pavel/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Yusuf\\Desktop\\team\\TSUAttendanceSystem\\TSUAttendanceSystem\\TSUAttendanceSystem\\TSUAttendanceSystem.csproj",
+      "projectUniqueName": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
       "projectName": "TSUAttendanceSystem",
-      "projectPath": "C:\\Users\\Yusuf\\Desktop\\team\\TSUAttendanceSystem\\TSUAttendanceSystem\\TSUAttendanceSystem\\TSUAttendanceSystem.csproj",
-      "packagesPath": "C:\\Users\\Yusuf\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Yusuf\\Desktop\\team\\TSUAttendanceSystem\\TSUAttendanceSystem\\TSUAttendanceSystem\\obj\\",
+      "projectPath": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
+      "packagesPath": "/Users/pavel/.nuget/packages/",
+      "outputPath": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Yusuf\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/pavel/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4952,8 +4945,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "direct"
-      }
+        "auditMode": "all"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -5029,6 +5023,20 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.11, 8.0.11]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.osx-arm64",
+            "version": "[8.0.11, 8.0.11]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.11, 8.0.11]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -5037,8 +5045,20 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/Users/pavel/.dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj",
+      "libraryId": "Microsoft.Extensions.Caching.Memory",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }
