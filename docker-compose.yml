@@ -2,8 +2,8 @@ services:
   tsuattendance:
     image: tsuattendance
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: .  # Root context
+      dockerfile: Dockerfile  # Path to Dockerfile is at the root level
     ports:
       - "5000:5000"
     environment:
