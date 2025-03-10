@@ -8,5 +8,8 @@ public class EditProfileDto
     public string FullName { get; set; }
 
     [Required]
+    [DataType(DataType.Date)]
+    [CurrentDate(ErrorMessage = "Birthday cannot be in the future.")]
     public DateTime BirthDate { get; set; }
 }
+

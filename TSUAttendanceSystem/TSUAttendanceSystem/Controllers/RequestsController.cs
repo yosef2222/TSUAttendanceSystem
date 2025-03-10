@@ -19,10 +19,14 @@ public class RequestsController : ControllerBase
         _context = context;
     }
 
-    [Authorize(Roles = "Student, Teacher")]
     [HttpPost]
     public async Task<IActionResult> CreateRequest([FromForm] CreateRequestDto requestDto, [FromForm] List<IFormFile> files)
     {
+        if (requestDto.AbsenceDateStart > requestDto.AbsenceDateEnd)
+        {
+            return BadRequest("AbsenceDateStart cannot be later than AbsenceDateEnd.");
+        }
+
         var userId = GetUserId();
         if (userId == null)
         {
@@ -42,7 +46,7 @@ public class RequestsController : ControllerBase
         _context.Requests.Add(request);
         await _context.SaveChangesAsync();
 
-        // Handle file uploads
+        // Обработка файлов
         if (files != null && files.Any())
         {
             foreach (var file in files)
@@ -70,8 +74,9 @@ public class RequestsController : ControllerBase
         return CreatedAtAction(nameof(GetMyRequests), new { id = request.Id }, request);
     }
 
+
     // Получение всех заявок текущего пользователя
-    [Authorize(Roles = "Student, Teacher")]
+    [Authorize(Roles = "Student, Teacher, Admin")]
     [HttpGet("my")]
     public async Task<IActionResult> GetMyRequests()
     {
@@ -123,7 +128,7 @@ public class RequestsController : ControllerBase
     }
 
     // Редактирование даты окончания заявки
-    [Authorize(Roles = "Student, Teacher")]
+    [Authorize(Roles = "Student, Teacher, Admin")]
     [HttpPut("{id}/edit-end-date")]
     public async Task<IActionResult> EditRequestEndDate(Guid id, [FromBody] EditRequestEndDateDto requestDto)
     {
@@ -139,26 +144,25 @@ public class RequestsController : ControllerBase
             return NotFound("Request not found.");
         }
 
-        // Проверяем, что заявка принадлежит текущему пользователю
         if (request.StudentId != userId.Value)
         {
             return Forbid("You can only edit your own requests.");
         }
 
-        // Обновляем дату окончания заявки
-        request.AbsenceDateEnd = requestDto.AbsenceDateEnd;
+        if (request.AbsenceDateStart > requestDto.AbsenceDateEnd)
+        {
+            return BadRequest("AbsenceDateStart cannot be later than AbsenceDateEnd.");
+        }
 
-        // Сбрасываем статус заявки на Pending
+        request.AbsenceDateEnd = requestDto.AbsenceDateEnd;
         request.Status = RequestStatus.Pending;
 
-        // Сохраняем изменения в базе данных
         _context.Requests.Update(request);
         await _context.SaveChangesAsync();
 
         return Ok(request);
     }
 
-    // Редактирование статуса заявки (для администраторов и деканов)
     [Authorize(Roles = "Admin,Dean")]
     [HttpPut("{id}/review")]
     public async Task<IActionResult> ReviewRequest(Guid id, [FromBody] ReviewRequestDto reviewDto)

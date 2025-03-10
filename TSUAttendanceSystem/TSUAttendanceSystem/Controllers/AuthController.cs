@@ -21,15 +21,18 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(UserDto request)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         try
         {
-            // Регистрируем пользователя и получаем токен
             var token = await _authService.Register(request);
             return Ok(new { Token = token });
         }
         catch (InvalidOperationException ex)
         {
-            // Обрабатываем ошибку, если пользователь уже существует
             return BadRequest(ex.Message);
         }
     }
