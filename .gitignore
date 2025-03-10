@@ -44,3 +44,14 @@ certificates/
 *.csproj.user
 .publish/
 publish/
+TSUAttendanceSystem/TSUAttendanceSystem/appsettings.json
+TSUAttendanceSystem/TSUAttendanceSystem/bin/Debug/net8.0/appsettings.json
+TSUAttendanceSystem/TSUAttendanceSystem/bin/Debug/net8.0/TSUAttendanceSystem.dll
+TSUAttendanceSystem/TSUAttendanceSystem/bin/Debug/net8.0/TSUAttendanceSystem.pdb
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/ref/TSUAttendanceSystem.dll
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/refint/TSUAttendanceSystem.dll
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.AssemblyInfo.cs
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.AssemblyInfoInputs.cache
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.dll
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.pdb
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.sourcelink.json
