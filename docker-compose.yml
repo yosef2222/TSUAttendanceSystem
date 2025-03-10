@@ -2,8 +2,8 @@ services:
   tsuattendance:
     image: tsuattendance
     build:
-      context: .  # Root context
-      dockerfile: Dockerfile  # Path to Dockerfile is at the root level
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     environment:
@@ -11,6 +11,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=AttendanceDB;User=user;Password=password;SslMode=None
     depends_on:
       - db
+    entrypoint: ["./wait-for-it.sh", "db", "3306", "--", "dotnet", "TSUAttendanceSystem.dll"]
 
   db:
     image: mysql:5.7
