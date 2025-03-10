@@ -44,3 +44,16 @@ certificates/
 *.csproj.user
 .publish/
 publish/
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.AssemblyInfo.cs
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.AssemblyInfoInputs.cache
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.assets.cache
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.csproj.AssemblyReference.cache
+TSUAttendanceSystem/TSUAttendanceSystem/obj/Debug/net8.0/TSUAttendanceSystem.GeneratedMSBuildEditorConfig.editorconfig
+TSUAttendanceSystem/TSUAttendanceSystem/obj/project.assets.json
+TSUAttendanceSystem/TSUAttendanceSystem/obj/project.nuget.cache
+TSUAttendanceSystem/TSUAttendanceSystem/obj/project.packagespec.json
+TSUAttendanceSystem/TSUAttendanceSystem/obj/rider.project.model.nuget.info
+TSUAttendanceSystem/TSUAttendanceSystem/obj/rider.project.restore.info
+TSUAttendanceSystem/TSUAttendanceSystem/obj/TSUAttendanceSystem.csproj.nuget.dgspec.json
+TSUAttendanceSystem/TSUAttendanceSystem/obj/TSUAttendanceSystem.csproj.nuget.g.props
+TSUAttendanceSystem/TSUAttendanceSystem/obj/TSUAttendanceSystem.csproj.nuget.g.targets
