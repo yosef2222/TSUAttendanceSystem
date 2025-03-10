@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(ModelState); // Возвращаем ошибки валидации
         }
 
         try

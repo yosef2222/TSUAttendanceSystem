@@ -9,7 +9,7 @@ public class EditProfileDto
 
     [Required]
     [DataType(DataType.Date)]
-    [CurrentDate(ErrorMessage = "Birthday cannot be in the future.")]
+    [BirthDateValidation(ErrorMessage = "Birthday cannot be in the future.")]
     public DateTime BirthDate { get; set; }
 }
 
