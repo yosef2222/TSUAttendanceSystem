@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -45,8 +44,7 @@ public class RequestsController : ControllerBase
 
         _context.Requests.Add(request);
         await _context.SaveChangesAsync();
-
-        // Обработка файлов
+        
         if (files != null && files.Any())
         {
             foreach (var file in files)
@@ -74,8 +72,7 @@ public class RequestsController : ControllerBase
         return CreatedAtAction(nameof(GetMyRequests), new { id = request.Id }, request);
     }
 
-
-    // Получение всех заявок текущего пользователя
+    
     [Authorize(Roles = "Student, Teacher, Admin")]
     [HttpGet("my")]
     public async Task<IActionResult> GetMyRequests()
@@ -86,7 +83,7 @@ public class RequestsController : ControllerBase
 
         var requests = await _context.Requests
             .Where(r => r.StudentId == userId.Value)
-            .Include(r => r.Files) // Include files related to the request
+            .Include(r => r.Files) 
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
@@ -96,14 +93,13 @@ public class RequestsController : ControllerBase
                 Status = r.Status,
                 StudentFullName = r.Student.FullName,
                 ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null,
-                FileIds = r.Files.Select(f => f.Id).ToList() // Get file IDs
+                FileIds = r.Files.Select(f => f.Id).ToList() 
             })
             .ToListAsync();
 
         return Ok(requests);
     }
-
-    // Получение всех заявок со статусом "Pending" (для администраторов и деканов)
+    
     [Authorize(Roles = "Admin, Dean")]
     [HttpGet("pending")]
     public async Task<IActionResult> GetPendingRequests()
@@ -112,7 +108,7 @@ public class RequestsController : ControllerBase
             .Where(r => r.Status == RequestStatus.Pending)
             .Include(r => r.Student)
             .Include(r => r.ReviewedBy)
-            .Include(r => r.Files) // Include files related to the request
+            .Include(r => r.Files) 
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
@@ -122,7 +118,7 @@ public class RequestsController : ControllerBase
                 Status = r.Status,
                 StudentFullName = r.Student.FullName,
                 ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null,
-                FileIds = r.Files.Select(f => f.Id).ToList() // Get file IDs
+                FileIds = r.Files.Select(f => f.Id).ToList() 
             })
             .ToListAsync();
 
@@ -159,8 +155,7 @@ public class RequestsController : ControllerBase
         request.Status = RequestStatus.Pending;
 
         _context.Requests.Update(request);
-
-        // Обработка файлов
+        
         if (files != null && files.Any())
         {
             foreach (var file in files)
@@ -213,14 +208,12 @@ public class RequestsController : ControllerBase
         {
             return BadRequest("This request has already been reviewed.");
         }
-
-        // Обновляем статус заявки
+        
         request.Status = reviewDto.Approve ? RequestStatus.Approved : RequestStatus.Rejected;
         request.ReviewedById = userId.Value;
 
         await _context.SaveChangesAsync();
-
-        // Возвращаем обновленную заявку с именем администратора
+        
         var result = new RequestDetailsDto
         {
             Id = request.Id,
@@ -234,19 +227,18 @@ public class RequestsController : ControllerBase
 
         return Ok(result);
     }
-
-    // Вспомогательный метод для получения ID текущего пользователя
+    
     private Guid? GetUserId()
     {
-        var userIdClaim = User.FindFirst("Id")?.Value; // Получаем значение claim "Id"
+        var userIdClaim = User.FindFirst("Id")?.Value; 
         if (string.IsNullOrEmpty(userIdClaim))
         {
-            return null; // Если claim отсутствует, возвращаем null
+            return null; 
         }
 
         if (!Guid.TryParse(userIdClaim, out var userId))
         {
-            return null; // Если значение не является корректным GUID, возвращаем null
+            return null; 
         }
 
         return userId;

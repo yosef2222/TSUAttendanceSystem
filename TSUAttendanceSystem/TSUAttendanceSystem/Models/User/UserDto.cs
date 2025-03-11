@@ -9,7 +9,7 @@ public class UserDto
     public string FullName { get; set; }
 
     [Required(ErrorMessage = "Birth date is required.")]
-    [BirthDateValidation] // Кастомная валидация даты рождения
+    [BirthDateValidation] 
     public DateTime Birthday { get; set; }
 
     [Required(ErrorMessage = "Email is required.")]

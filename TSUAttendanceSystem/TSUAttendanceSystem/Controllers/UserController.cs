@@ -23,19 +23,16 @@ public class UserController : BaseController
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers()
     {
-        // Получаем ID текущего пользователя из токена
         var userId = Guid.Parse(User.FindFirst("Id")?.Value);
         var user = await _context.Users
             .Include(u => u.Role)
             .SingleOrDefaultAsync(u => u.Id == userId);
-
-        // Проверяем, является ли текущий пользователь администратором
+        
         if (user == null || !user.Role.IsAdmin)
         {
-            return new ForbidResult(); // Запрещаем доступ, если пользователь не администратор
+            return new ForbidResult(); 
         }
-
-        // Возвращаем список всех пользователей с их ролями
+        
         return await _userService.GetAllUsers();
     }
 
@@ -43,10 +40,8 @@ public class UserController : BaseController
     [HttpGet("roles")]
     public async Task<IActionResult> GetUserRoles()
     {
-        // Получаем ID текущего пользователя из токена
         var userId = Guid.Parse(User.FindFirst("Id")?.Value);
-
-        // Возвращаем роли текущего пользователя
+        
         return await _userService.GetUserRoles(userId);
     }
 }
