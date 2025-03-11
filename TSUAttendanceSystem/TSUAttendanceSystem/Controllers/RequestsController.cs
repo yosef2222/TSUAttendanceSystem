@@ -129,10 +129,9 @@ public class RequestsController : ControllerBase
         return Ok(requests);
     }
 
-    // Редактирование даты окончания заявки
     [Authorize(Roles = "Student, Teacher, Admin")]
     [HttpPut("{id}/edit-end-date")]
-    public async Task<IActionResult> EditRequestEndDate(Guid id, [FromBody] EditRequestEndDateDto requestDto)
+    public async Task<IActionResult> EditRequestEndDate(Guid id, [FromForm] EditRequestEndDateDto requestDto, [FromForm] List<IFormFile> files)
     {
         var userId = GetUserId();
         if (userId == null)
@@ -160,6 +159,31 @@ public class RequestsController : ControllerBase
         request.Status = RequestStatus.Pending;
 
         _context.Requests.Update(request);
+
+        // Обработка файлов
+        if (files != null && files.Any())
+        {
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    using var memoryStream = new MemoryStream();
+                    await file.CopyToAsync(memoryStream);
+
+                    var uploadedFile = new FileDocument
+                    {
+                        Id = Guid.NewGuid(),
+                        FileName = file.FileName,
+                        ContentType = file.ContentType,
+                        Data = memoryStream.ToArray(),
+                        RequestId = request.Id
+                    };
+
+                    _context.Files.Add(uploadedFile);
+                }
+            }
+        }
+
         await _context.SaveChangesAsync();
 
         return Ok(request);
