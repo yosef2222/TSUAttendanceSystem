@@ -8,6 +8,8 @@ using TSUAttendanceSystem.Data;
 using TSUAttendanceSystem.Models;
 using TSUAttendanceSystem.Services;
 using TSUAttendanceSystem.Services.Auth;
+using TSUAttendanceSystem.Services.Requests;
+using TSUAttendanceSystem.Services.Role;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
@@ -26,7 +28,6 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "TSU Attendance System API", Version = "v1" });
 
-    // ✅ Enable JWT Authentication in Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -49,22 +50,18 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ✅ Load configuration
 var configuration = builder.Configuration;
 
-// ✅ Ensure JWT Key exists (to avoid crashes)
 var jwtKey = configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKey))
 {
     throw new InvalidOperationException("🚨 JWT Secret is not configured! Set 'Jwt:Key' in appsettings.json or environment variables.");
 }
 
-// ✅ Register services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ Database connection with retry logic
 var connectionString = configuration.GetConnectionString("DefaultConnection") 
     ?? throw new InvalidOperationException("🚨 Database connection string is missing!");
 
@@ -74,12 +71,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         mysqlOptions => mysqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null)
     ));
 
-// ✅ Dependency injection for authentication services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>(); // Добавьте эту строку
+builder.Services.AddScoped<IUserService, UserService>(); 
 builder.Services.AddSingleton<JwtService>();
+builder.Services.AddScoped<IRequestsService, RequestsService>();
+builder.Services.AddScoped<IRolesService, RolesService>();
 
-// ✅ Configure JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -97,14 +94,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// ✅ Apply database migrations automatically inside Docker
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate(); // Apply any pending migrations
+    dbContext.Database.Migrate(); 
 }
 
-// ✅ Middleware pipeline
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -27,7 +27,7 @@ public class AuthService : IAuthService
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             FullName = request.FullName,
             Birthday = request.Birthday,
-            Role = new Role
+            Role = new Models.Role
             {
                 IsAdmin = false, 
                 IsTeacher = false,

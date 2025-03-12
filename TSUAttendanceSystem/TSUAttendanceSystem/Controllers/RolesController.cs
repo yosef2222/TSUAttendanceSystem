@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TSUAttendanceSystem.Data;
+using TSUAttendanceSystem.Services.Role;
 
 namespace TSUAttendanceSystem.Controllers;
 
@@ -10,36 +9,40 @@ namespace TSUAttendanceSystem.Controllers;
 [ApiController]
 public class RolesController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IRolesService _rolesService;
 
-    public RolesController(ApplicationDbContext context)
+    public RolesController(IRolesService rolesService)
     {
-        _context = context;
+        _rolesService = rolesService;
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPut("grant-dean/{userId}")]
     public async Task<IActionResult> GrantDeanRole(Guid userId)
     {
-        var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null) return NotFound("User not found.");
-
-        user.Role.IsDean = true;
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = $"User {user.FullName} is now a Dean." });
+        try
+        {
+            var result = await _rolesService.GrantDeanRoleAsync(userId);
+            return Ok(new { message = result });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [Authorize(Roles = "Admin,Dean")]
     [HttpPut("grant-teacher/{userId}")]
     public async Task<IActionResult> GrantTeacherRole(Guid userId)
     {
-        var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null) return NotFound("User not found.");
-
-        user.Role.IsTeacher = true;
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = $"User {user.FullName} is now a Teacher." });
+        try
+        {
+            var result = await _rolesService.GrantTeacherRoleAsync(userId);
+            return Ok(new { message = result });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
