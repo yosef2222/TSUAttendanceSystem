@@ -4916,11 +4916,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
+      "projectUniqueName": "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
       "projectName": "TSUAttendanceSystem",
-      "projectPath": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
+      "projectPath": "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
       "packagesPath": "/Users/pavel/.nuget/packages/",
-      "outputPath": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/obj/",
+      "outputPath": "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/pavel/.nuget/NuGet/NuGet.Config"
@@ -4945,8 +4945,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "direct"
-      }
+        "auditMode": "all"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -5022,6 +5023,20 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.11, 8.0.11]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.osx-arm64",
+            "version": "[8.0.11, 8.0.11]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.11, 8.0.11]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -5030,8 +5045,30 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/Users/pavel/.dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.AspNetCore.Identity' 2.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-2865-hh9g-w894",
+      "libraryId": "Microsoft.AspNetCore.Identity",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj",
+      "libraryId": "Microsoft.Extensions.Caching.Memory",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

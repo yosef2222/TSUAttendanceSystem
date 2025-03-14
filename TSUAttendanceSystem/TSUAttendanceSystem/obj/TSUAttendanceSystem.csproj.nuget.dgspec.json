@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj": {}
+    "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj": {}
   },
   "projects": {
-    "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj": {
+    "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
+        "projectUniqueName": "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
         "projectName": "TSUAttendanceSystem",
-        "projectPath": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
+        "projectPath": "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem.csproj",
         "packagesPath": "/Users/pavel/.nuget/packages/",
-        "outputPath": "/Users/pavel/Desktop/TSUAttendanceSystem/TSUAttendanceSystem/TSUAttendanceSystem/obj/",
+        "outputPath": "/Users/pavel/Desktop/WEB-BACK/TSUAttendanceSystem/TSUAttendanceSystem/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/pavel/.nuget/NuGet/NuGet.Config"
@@ -36,8 +36,9 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
-        }
+          "auditMode": "all"
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -113,6 +114,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.11, 8.0.11]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[8.0.11, 8.0.11]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.11, 8.0.11]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -121,7 +136,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/Users/pavel/.dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

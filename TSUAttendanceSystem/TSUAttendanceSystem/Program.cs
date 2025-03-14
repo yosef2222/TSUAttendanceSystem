@@ -12,6 +12,18 @@ using TSUAttendanceSystem.Services.Requests;
 using TSUAttendanceSystem.Services.Role;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -103,6 +115,7 @@ using (var scope = app.Services.CreateScope())
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowAll");
 
 app.MapControllers();
 
