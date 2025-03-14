@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+<div class="page-container align-center">
     <div class="container">
         <h1>Регистрация</h1>
         <form id="registerForm">
@@ -16,17 +8,16 @@
             <input type="email" id="email" name="email" required>
             <label for="password">Пароль:</label>
             <input type="password" id="password" name="password" required>
-            <label for="group">Группа:</label>
-            <input type="text" id="group" name="group" required>
+            <label for="birthday">Дата рождения:</label>
+            <input type="date" id="birthday" required>
+            <!--<label for="group">Группа:</label>
+            <input type="text" id="group" name="group" required>-->
             <label for="role">Роль:</label>
             <select id="role" name="role" required>
-                <option value="student">Студент</option>
-                <option value="teacher">Преподаватель</option>
+                <option value="true">Студент</option>
+                <option value="false">Преподаватель</option>
             </select>
             <button type="submit">Зарегистрироваться</button>
         </form>
-        <p>Уже есть аккаунт? <a href="index.html">Войдите</a></p>
     </div>
-    <script src="script.js"></script> 
-</body>
-</html>
+</div>
