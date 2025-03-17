@@ -4,7 +4,8 @@ const urlRoutes = {
     404: { template: "/pages/404.html", title: "404 | " + urlPageTitle, script: null },
     "/": { template: "/pages/main.html", title: "Главная | " + urlPageTitle, script: null },
     "/login": { template: "/pages/login.html", title: "Вход | " + urlPageTitle, script: "js/login.js" },
-    "/registration": { template: "/pages/registration.html", title: "Регистрация | " + urlPageTitle, script: "js/registration.js" }
+    "/registration": { template: "/pages/registration.html", title: "Регистрация | " + urlPageTitle, script: "js/registration.js" },
+    "/absences": { template: "/pages/absences.html", title: "Мои пропуски | " + urlPageTitle, script: "js/absences.js" }
 };
 
 const route = (event) => {
@@ -12,6 +13,31 @@ const route = (event) => {
     event.preventDefault();
     window.history.pushState({}, "", event.target.href);
     locationHandler();
+};
+
+const checkTokenValidity = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+
+    try {
+        console.log("Проверка токена на сервере...");
+        const response = await fetch('http://localhost:5000/api/Auth/profile', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            console.warn("Сервер отклонил токен. Удаляем его...");
+            localStorage.removeItem('token');
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.error("Ошибка при проверке токена:", error);
+        localStorage.removeItem('token');
+        return false;
+    }
 };
 
 const loadScript = (scriptPath) => {
@@ -55,8 +81,7 @@ function parseJwt(token) {
 }
 
 const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    return token && parseJwt(token);
+    return checkTokenValidity();
 };
 
 const updateHeader = () => {
@@ -64,19 +89,40 @@ const updateHeader = () => {
     const currentPath = window.location.pathname;
     const token = localStorage.getItem('token');
     const user = token ? parseJwt(token) : null;
-
+    const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
+    const studentMatch = currentPath.match(/^\/student\/(.+)$/);
     if (token && !user) {
         localStorage.removeItem('token');
     }
 
-    if (user) {
-        header.innerHTML = `
+    if (user && isAuthenticated()) {
+        if(absencesMatch){
+            header.innerHTML = `
             <a href="/">Система учета пропусков</a>
             <nav>
                 <a href="/student/${encodeURIComponent(user.email)}">Личный кабинет</a>
                 <a href="/" id="logout">Выход</a>
             </nav>
-        `;
+            `;
+        } else if(studentMatch){
+            header.innerHTML = `
+            <a href="/">Система учета пропусков</a>
+            <nav>
+                <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
+                <a href="/" id="logout">Выход</a>
+            </nav>
+            `;
+        } else {
+            header.innerHTML = `
+            <a href="/">Система учета пропусков</a>
+            <nav>
+                <a href="/student/${encodeURIComponent(user.email)}">Личный кабинет</a>
+                <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
+                <a href="/" id="logout">Выход</a>
+            </nav>
+            `;
+        }
+        ;
         document.getElementById('logout').addEventListener('click', () => {
             localStorage.removeItem('token');
             window.location.href = "/";
@@ -107,19 +153,17 @@ const locationHandler = async () => {
     const token = localStorage.getItem('token');
     const user = token ? parseJwt(token) : null;
 
-    if (token && !user) {
+    if (!user && !(await isAuthenticated()) && location !== "/login" && location !== "/registration" && location !== "/") {
+        console.warn("Не авторизован. Перенаправление на /login...");
         localStorage.removeItem('token');
-    }
-
-    if (isAuthenticated() && (location === "/login" || location === "/registration")) {
-        window.location.href = "/";
+        window.location.href = "/login";
         return;
     }
     
     const studentMatch = location.match(/^\/student\/(.+)$/);
     if (studentMatch) {
         const studentEmail = decodeURIComponent(studentMatch[1]);
-        console.log("📧 Email студента из URL:", studentEmail);
+        console.log("Email студента из URL:", studentEmail);
 
         const html = await fetch("/pages/student.html").then(res => res.text());
         document.getElementById("content").innerHTML = html;
@@ -133,6 +177,27 @@ const locationHandler = async () => {
         updateHeader();
         return;
     }
+    
+    const absencesMatch = location.match(/^\/absences\/(.+)$/);
+    if (absencesMatch) {
+        const studentEmail = decodeURIComponent(absencesMatch[1]);
+        console.log("📧 Email студента из URL:", studentEmail);
+
+        const html = await fetch("/pages/absences.html").then(res => res.text());
+        document.getElementById("content").innerHTML = html;
+        document.title = "Мои пропуски | " + urlPageTitle;
+
+        try {
+            await loadScript("js/absences.js");
+            console.log("Скрипт absences.js загружен.");
+        } catch (error) {
+            console.error("Ошибка загрузки absences.js:", error);
+        }
+
+        updateHeader();
+        return;
+    }
+    
     const route = urlRoutes[location] || urlRoutes[404];
     const html = await fetch(route.template).then(response => response.text());
     document.getElementById("content").innerHTML = html;

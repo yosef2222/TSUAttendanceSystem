@@ -15,7 +15,7 @@ console.log("скрипт выполняется");
         const response = await fetch('http://localhost:5000/api/Auth/profile', {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`  // Передаем токен в заголовке
+                'Authorization': `Bearer ${token}` 
             }
         });
 
@@ -42,8 +42,8 @@ function displayStudentInfo(userData) {
     const studentNameElement = document.getElementById("studentName");
 
     if (studentNameElement) {
-        studentNameElement.textContent = userData.fullName;  // Отображаем имя
-        console.log("📝 Информация о студенте обновлена!");
+        studentNameElement.textContent = userData.fullName;
+        console.log("Информация о студенте обновлена!");
     } else {
         console.error("Ошибка: Элемент с id 'studentName' не найден в DOM");
     }
