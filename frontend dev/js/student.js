@@ -12,7 +12,7 @@ console.log("скрипт выполняется");
 
     try {
         console.log("Отправка запроса на сервер...");
-        const response = await fetch('http://localhost:5000/api/Auth/profile', {
+        const response = await fetch('http://localhost:5163/api/Auth/profile', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}` 

@@ -29,6 +29,7 @@ function renderTable() {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${absence.reason}</td>
+            <td>${absence.status}</td>
             <td>${absence.dateStart}</td>
             <td>${absence.dateEnd}</td>
             <td>${absence.file ? `<a href="${absence.file}" download="справка.pdf">Скачать файл</a>` : "Нет файла"}</td>
@@ -44,6 +45,7 @@ function renderTable() {
 form.addEventListener("submit", function (e) {
     e.preventDefault();
     const reason = document.getElementById("reason").value;
+    const status = "Не принято";
     const dateStart = document.getElementById("dateStart").value;
     const dateEnd = document.getElementById("dateEnd").value;
     const fileInput = document.getElementById("file");
@@ -52,7 +54,7 @@ form.addEventListener("submit", function (e) {
     const reader = new FileReader();
     reader.onload = function (e) {
         const fileData = file ? e.target.result : null;
-        const newAbsence = {reason, dateStart, dateEnd,  file: fileData};
+        const newAbsence = {reason, status, dateStart, dateEnd,  file: fileData};
 
         if (editingIndex !== null) {
             absences[editingIndex] = newAbsence;
