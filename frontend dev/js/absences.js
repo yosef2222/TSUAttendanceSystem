@@ -13,7 +13,12 @@ openModalBtn.addEventListener("click", () => {
     editingIndex = null;
     form.reset();
     modal.style.display = "block";
+    document.querySelector(".modal-content h2").textContent = "Создание пропуска"; 
+    document.getElementById("reason").disabled = false; 
+    document.getElementById("dateStart").disabled = false; 
+    document.getElementById("dateEnd").disabled = false; 
 });
+
 
 closeModalBtn.addEventListener("click", () => {
     modal.style.display = "none";
@@ -45,7 +50,7 @@ async function fetchAbsences() {
         }
 
         const data = await response.json();
-        absences = data; 
+        absences = data;
         renderTable();
     } catch (error) {
         console.error("Ошибка при получении пропусков:", error);
@@ -53,11 +58,11 @@ async function fetchAbsences() {
 }
 
 async function renderTable() {
-    tbody.innerHTML = ""; 
+    tbody.innerHTML = "";
 
     for (const [index, absence] of absences.entries()) {
-        const dateStart = absence.absenceDateStart ? new Date(absence.absenceDateStart).toLocaleString() : "-";
-        const dateEnd = absence.absenceDateEnd ? new Date(absence.absenceDateEnd).toLocaleString() : "-";
+        const dateStart = absence.absenceDateStart ? formatDateTime(absence.absenceDateStart) : "-";
+        const dateEnd = absence.absenceDateEnd ? formatDateTime(absence.absenceDateEnd) : "-";
 
         let fileLinks = "Нет файлов";
         if (absence.fileIds && absence.fileIds.length > 0) {
@@ -79,7 +84,6 @@ async function renderTable() {
         tbody.appendChild(row);
     }
 }
-
 
 async function fetchFileLinks(requestId, fileIds) {
     const token = localStorage.getItem("token");
@@ -114,38 +118,67 @@ async function fetchFileLinks(requestId, fileIds) {
     }
 }
 
+function formatDateTime(dateStr) {
+    const date = new Date(dateStr);
+    const options = { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false 
+    };
+    return date.toLocaleString("ru-RU", options); 
+}
+
+function toISOWithoutTimezone(dateStr) {
+    const date = new Date(dateStr);
+    const tzOffset = date.getTimezoneOffset() * 60000; 
+    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+}
+
+window.editAbsence = function (index) {
+    editingIndex = index;
+    const absence = absences[index];
+
+    document.querySelector(".modal-content h2").textContent = "Редактирование пропуска"; 
+    
+    document.getElementById("reason").value = absence.reason;
+    document.getElementById("reason").disabled = true; 
+    
+    document.getElementById("dateStart").value = absence.absenceDateStart ? toISOWithoutTimezone(absence.absenceDateStart) : "";
+    document.getElementById("dateStart").disabled = true; 
+    
+    document.getElementById("dateEnd").value = absence.absenceDateEnd ? toISOWithoutTimezone(absence.absenceDateEnd) : "";
+    document.getElementById("dateEnd").disabled = false; 
+
+    document.getElementById("file").disabled = false; 
+    modal.style.display = "block";
+};
 
 form.addEventListener("submit", async function (e) {
     e.preventDefault();
-
-    const reason = document.getElementById("reason").value.trim();
+    const reasonInput = document.getElementById("reason").value;
     const dateStartInput = document.getElementById("dateStart").value;
     const dateEndInput = document.getElementById("dateEnd").value;
     const fileInput = document.getElementById("file");
 
-    if (!reason) {
-        console.error("Поле 'Reason' не может быть пустым");
+    if (!reasonInput || !dateStartInput || !dateEndInput) {
+        console.error("Поля 'Причина', 'Дата начала' и 'Дата окончания' должны быть заполнены");
         return;
     }
-    if (!dateStartInput || !dateEndInput) {
-        console.error("Поля даты должны быть заполнены");
-        return;
-    }
-
-    const dateStart = new Date(dateStartInput).toISOString();
-    const dateEnd = new Date(dateEndInput).toISOString();
+    
+    const dateStart = toISOWithoutTimezone(dateStartInput);
+    const dateEnd = toISOWithoutTimezone(dateEndInput);
 
     const formData = new FormData();
-    formData.append("Reason", reason);
+    formData.append("Reason", reasonInput);
     formData.append("AbsenceDateStart", dateStart);
     formData.append("AbsenceDateEnd", dateEnd);
 
     if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         formData.append("files", file);
-    } else {
-        console.error("Файл не выбран");
-        return;
     }
 
     try {
@@ -155,8 +188,17 @@ form.addEventListener("submit", async function (e) {
             return;
         }
 
-        const response = await fetch("http://localhost:5163/api/Requests", {
-            method: "POST",
+        let url = "http://localhost:5163/api/Requests";
+        let method = "POST";
+
+        if (editingIndex !== null) {
+            const absenceId = absences[editingIndex].id;
+            url = `http://localhost:5163/api/Requests/${absenceId}/edit-end-date`;
+            method = "PUT";
+        }
+
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 "Authorization": `Bearer ${token}`
             },
@@ -167,8 +209,7 @@ form.addEventListener("submit", async function (e) {
             throw new Error(`Ошибка: ${response.statusText}`);
         }
 
-        const result = await response.json();
-        console.log("Успешно добавлено:", result);
+        console.log(`Успешно ${editingIndex !== null ? "обновлено" : "добавлено"}`);
 
         modal.style.display = "none";
         form.reset();
@@ -176,17 +217,6 @@ form.addEventListener("submit", async function (e) {
 
         fetchAbsences();
     } catch (error) {
-        console.error("Ошибка при добавлении пропуска:", error);
+        console.error(`Ошибка при ${editingIndex !== null ? "редактировании" : "добавлении"} пропуска:`, error);
     }
 });
-
-window.editAbsence = function (index) {
-    editingIndex = index;
-    const absence = absences[index];
-    
-    document.getElementById("reason").value = absence.reason;
-    document.getElementById("dateStart").value = absence.dateStart;
-    document.getElementById("dateEnd").value = absence.dateEnd;
-
-    modal.style.display = "block";
-};
