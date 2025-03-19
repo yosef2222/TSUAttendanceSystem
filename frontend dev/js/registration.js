@@ -5,8 +5,8 @@ if (document.getElementById('registerForm')) {
         const fullName = document.getElementById('fullName').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const birthday = document.getElementById('birthday').value;
-        const isStudent = document.getElementById('role').value === 'true';
+        const birthday = new Date().toISOString();
+        const isStudent = true;
 
         const newUser = {
             fullName,
@@ -17,7 +17,7 @@ if (document.getElementById('registerForm')) {
         };
 
         try {
-            const response = await fetch("http://localhost:5000/api/Auth/register", {
+            const response = await fetch("http://localhost:5163/api/Auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

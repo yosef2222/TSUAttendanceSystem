@@ -11,9 +11,6 @@ function parseJwt(token) {
         ).join(''));
 
         const payload = JSON.parse(jsonPayload);
-
-        payload.isStudent = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] === "Student";
-
         return payload;
     } catch (e) {
         console.error("Ошибка декодирования JWT:", e);
@@ -30,7 +27,7 @@ if (document.getElementById('loginForm')) {
         const password = document.getElementById('password').value;
 
         try {
-            const response = await fetch('http://localhost:5000/api/Auth/login', {
+            const response = await fetch('http://localhost:5163/api/Auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -51,14 +48,24 @@ if (document.getElementById('loginForm')) {
             if (!user) throw new Error("Ошибка при разборе токена.");
 
             alert('Вход выполнен успешно!');
-
-            if (user.isStudent) {
+            const userRole = user["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            if (userRole === "Student") {
                 const studentUrl = `/student/${encodeURIComponent(user.email)}`;
                 window.history.pushState({}, "", studentUrl);
                 locationHandler();
-            } else {
-                window.location.href = 'admin.html';
-            }
+            } else if (userRole === "Admin"){
+                const adminUrl = `/admin/${encodeURIComponent(user.email)}`;
+                window.history.pushState({}, "", adminUrl);
+                locationHandler();
+            } else if (userRole === "Dean"){
+                const adminUrl = `/dean/${encodeURIComponent(user.email)}`;
+                window.history.pushState({}, "", adminUrl);
+                locationHandler();
+            } else{
+                const adminUrl = `/teacher/${encodeURIComponent(user.email)}`;
+                window.history.pushState({}, "", adminUrl);
+                locationHandler();
+            } 
         } catch (error) {
             alert(error.message);
         }

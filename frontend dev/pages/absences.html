@@ -1,0 +1,46 @@
+<div class="page-container">
+    <div class="container">
+        <header>
+            <h2>Мои пропуски</h2>
+        </header>
+        <button id="openCreateAbsenceModal">Создать пропуск</button>
+        <section>
+            <table id="absencesTable">
+                <thead>
+                    <tr>
+                        <th>Причина</th>
+                        <th>Статус</th>
+                        <th>Дата начала</th>
+                        <th>Дата окончания</th>
+                        <th>Файлы</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        
+
+        <div id="createAbsenceModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Создание пропуска</h2>
+                <form id="createAbsenceForm">
+                    <label for="reason">Причина:</label>
+                    <input type="text" id="reason" name="reason" required>
+                    
+                    <label for="dateStart">Дата начала:</label>
+                    <input type="datetime-local" id="dateStart" name="dateStart" required>
+
+                    <label for="dateEnd">Дата окончания:</label>
+                    <input type="datetime-local" id="dateEnd" name="dateEnd" required>
+
+                    <label for="file">Прикрепить файл (например, справку):</label>
+                    <input type="file" id="file" name="file">
+
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

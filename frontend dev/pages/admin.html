@@ -1,29 +1,12 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление пользователями</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-    <header>
-        <a href="index.html">Главная</a>
-        <nav>
-            <a href="admin.html">Пользователи</a>
-            <a href="passes.html">Пропуски</a>
-        </nav>
-    </header>
 
+ <div class="page-container align-center">
     <div class="container">
         <h1>Управление пользователями</h1>
-        <button onclick="window.location.href='passes.html'" style="margin-bottom: 20px;">
-            Перейти к управлению пропусками
-        </button>
         <table id="usersTable">
             <thead>
                 <tr>
                     <th>Имя</th>
+                    <th>Email</th>
                     <th>Роль</th>
                     <th>Действия</th>
                 </tr>
@@ -32,7 +15,4 @@
             </tbody>
         </table>
     </div>
-
-    <script src="/js/admin.js"></script>
-</body>
-</html>
+<div>
