@@ -10,5 +10,6 @@ public class User
     public Role Role { get; set; }
     public List<Request> Requests { get; set; } = new();
     public List<Request> ReviewedRequests { get; set; } = new();
+    public string GroupNumber { get; set; }
 
 }

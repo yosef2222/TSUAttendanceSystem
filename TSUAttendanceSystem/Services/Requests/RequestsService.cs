@@ -203,4 +203,28 @@ public class RequestsService : IRequestsService
 
         return file;
     }
+    
+    public async Task<List<RequestDetailsDto>> GetApprovedRequestsAsync()
+    {
+        var requests = await _context.Requests
+            .Where(r => r.Status == RequestStatus.Approved)
+            .Include(r => r.Student)
+            .Include(r => r.ReviewedBy)
+            .Include(r => r.Files)
+            .Select(r => new RequestDetailsDto
+            {
+                Id = r.Id,
+                Reason = r.Reason,
+                AbsenceDateStart = r.AbsenceDateStart,
+                AbsenceDateEnd = r.AbsenceDateEnd,
+                Status = r.Status,
+                StudentFullName = r.Student.FullName,
+                ReviewedByFullName = r.ReviewedBy != null ? r.ReviewedBy.FullName : null,
+                FileIds = r.Files.Select(f => f.Id).ToList()
+            })
+            .ToListAsync();
+
+        return requests;
+    }
+    
 }

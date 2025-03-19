@@ -11,5 +11,7 @@ public class EditProfileDto
     [DataType(DataType.Date)]
     [BirthDateValidation(ErrorMessage = "Birthday cannot be in the future.")]
     public DateTime BirthDate { get; set; }
+    
+    public string GroupNumber { get; set; }
 }
 

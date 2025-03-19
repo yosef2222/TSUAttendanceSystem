@@ -22,5 +22,8 @@ public class UserDto
     public string Password { get; set; }
 
     [Required(ErrorMessage = "IsStudent field is required.")]
+    
+    public string GroupNumber { get; set; }
     public bool IsStudent { get; set; }
+    
 }

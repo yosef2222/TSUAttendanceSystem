@@ -27,6 +27,7 @@ public class AuthService : IAuthService
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             FullName = request.FullName,
             Birthday = request.Birthday,
+            GroupNumber = request.GroupNumber,
             Role = new Models.Role
             {
                 IsAdmin = false, 
@@ -65,7 +66,8 @@ public class AuthService : IAuthService
         {
             FullName = user.FullName,
             Email = user.Email,
-            BirthDate = user.Birthday
+            BirthDate = user.Birthday,
+            GroupNumber = user.GroupNumber
         };
     }
 
@@ -86,7 +88,8 @@ public class AuthService : IAuthService
         {
             FullName = user.FullName,
             Email = user.Email,
-            BirthDate = user.Birthday
+            BirthDate = user.Birthday,
+            GroupNumber = user.GroupNumber
         };
     }
 }

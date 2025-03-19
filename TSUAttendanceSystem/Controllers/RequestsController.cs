@@ -101,4 +101,13 @@ public class RequestsController : ControllerBase
 
         return userId;
     }
+
+    [Authorize(Roles = "Admin, Dean, Teacher")]
+    [HttpGet("approved")]
+    public async Task<IActionResult> GetApprovedRequests()
+    {
+        var requests = await _requestsService.GetApprovedRequestsAsync();
+        return Ok(requests);
+    }
+
 }
