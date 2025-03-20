@@ -10,7 +10,7 @@ public class RequestDetailsDto
     public DateTime AbsenceDateEnd { get; set; }
     public RequestStatus Status { get; set; }
     public string StudentFullName { get; set; } 
+    public string GroupNumber { get; set; }
     public string ReviewedByFullName { get; set; } 
     public List<Guid> FileIds { get; set; } 
-
 }

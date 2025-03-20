@@ -69,6 +69,7 @@ public class RequestsService : IRequestsService
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
+                GroupNumber = r.Student.GroupNumber,
                 Reason = r.Reason,
                 AbsenceDateStart = r.AbsenceDateStart,
                 AbsenceDateEnd = r.AbsenceDateEnd,
@@ -92,6 +93,7 @@ public class RequestsService : IRequestsService
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
+                GroupNumber = r.Student.GroupNumber,
                 Reason = r.Reason,
                 AbsenceDateStart = r.AbsenceDateStart,
                 AbsenceDateEnd = r.AbsenceDateEnd,
@@ -214,6 +216,7 @@ public class RequestsService : IRequestsService
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
+                GroupNumber = r.Student.GroupNumber,
                 Reason = r.Reason,
                 AbsenceDateStart = r.AbsenceDateStart,
                 AbsenceDateEnd = r.AbsenceDateEnd,
