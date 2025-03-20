@@ -3,6 +3,7 @@
         <header>
             <h2>Мои пропуски</h2>
         </header>
+        <button id="openCreateAbsenceModal">Создать пропуск</button>
         <section>
             <table id="absencesTable">
                 <thead>
@@ -18,7 +19,7 @@
                 <tbody></tbody>
             </table>
         </section>
-        <button id="openCreateAbsenceModal">Создать пропуск</button>
+        
 
         <div id="createAbsenceModal" class="modal">
             <div class="modal-content">
@@ -29,10 +30,10 @@
                     <input type="text" id="reason" name="reason" required>
                     
                     <label for="dateStart">Дата начала:</label>
-                    <input type="date" id="dateStart" name="dateStart" required>
+                    <input type="datetime-local" id="dateStart" name="dateStart" required>
 
                     <label for="dateEnd">Дата окончания:</label>
-                    <input type="date" id="dateEnd" name="dateEnd" required>
+                    <input type="datetime-local" id="dateEnd" name="dateEnd" required>
 
                     <label for="file">Прикрепить файл (например, справку):</label>
                     <input type="file" id="file" name="file">
