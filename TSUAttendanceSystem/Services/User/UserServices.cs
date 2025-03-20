@@ -19,15 +19,22 @@ public class UserService : IUserService
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _context.Users
-            .Include(u => u.Role)
+            .Include(u => u.Role) 
             .Select(u => new
             {
                 Id = u.Id,
                 FullName = u.FullName,
-                Email = u.Email
+                Email = u.Email,
+                Roles = new 
+                {
+                    IsStudent = u.Role.IsStudent,
+                    IsTeacher = u.Role.IsTeacher,
+                    IsAdmin = u.Role.IsAdmin,
+                    IsDean = u.Role.IsDean
+                }
             })
             .ToListAsync();
-        
+    
         return new OkObjectResult(users);
     }
 
