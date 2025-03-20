@@ -1,5 +1,5 @@
 const tableBody = document.querySelector('#usersTable tbody');
-const jwtToken = localStorage.getItem('token'); // Замените на ваш JWT токен
+const jwtToken = localStorage.getItem('token'); 
 let users = [];
 function fetchUsers() {
     fetch('http://localhost:5163/User/users', {

@@ -131,6 +131,8 @@ function formatDateTime(dateStr) {
     return date.toLocaleString("ru-RU", options); 
 }
 
+
+
 function toISOWithoutTimezone(dateStr) {
     const date = new Date(dateStr);
     const tzOffset = date.getTimezoneOffset() * 60000; 
