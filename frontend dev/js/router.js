@@ -14,35 +14,6 @@ const route = (event) => {
     locationHandler();
 };
 
-
-//получаю роли пользователя
-async function fetchRoles() {
-    try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            console.error("Токен авторизации отсутствует");
-            return null;
-        }
-
-        const response = await fetch("http://localhost:5163/User/roles", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Ошибка: ${response.statusText}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error("Ошибка при получении ролей", error);
-        return null;
-    }
-}
-
-
 //работа с токеном
 const checkTokenValidity = async () => {
     const token = localStorage.getItem('token');
@@ -111,24 +82,56 @@ const loadScript = (scriptPath) => {
     });
 };
 
-
 //обновление хедера
 const updateHeader = async () => {
     const header = document.getElementById('header');
     const currentPath = window.location.pathname;
     const token = localStorage.getItem('token');
+    const user = token ? parseJwt(token) : null;
+    const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
+    const studentMatch = currentPath.match(/^\/student\/(.+)$/);
+    const adminMatch = currentPath.match(/^\/admin\/(.+)$/);
+    const passesMatch = currentPath.match(/^\/passes\/(.+)$/);
     const isAuthtorized = await checkTokenValidity();
     
     if (!isAuthtorized) {
         localStorage.removeItem('token');
     }
 
-    if (isAuthtorized && token !== null) {
-        const userRoles = await fetchRoles();
-        const user = parseJwt(token);
-        if(userRoles.isAdmin){
-            const adminMatch = currentPath.match(/^\/admin\/(.+)$/);
-            const passesMatch = currentPath.match(/^\/passes\/(.+)$/);
+    if (isAuthtorized && user !== null) {
+        const userRole = user["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+        if(userRole === "Student"){
+            if(absencesMatch){
+                header.innerHTML = `
+                <a href="/">Система учета пропусков</a>
+                <nav>
+                    <a href="/student/${encodeURIComponent(user.email)}">Личный кабинет</a>
+                    <a href="/" id="logout">Выход</a>
+                </nav>
+                `;
+            } else if(studentMatch){
+                header.innerHTML = `
+                <a href="/">Система учета пропусков</a>
+                <nav>
+                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
+                    <a href="/" id="logout">Выход</a>
+                </nav>
+                `;
+            } else {
+                header.innerHTML = `
+                <a href="/">Система учета пропусков</a>
+                <nav>
+                    <a href="/student/${encodeURIComponent(user.email)}">Личный кабинет</a>
+                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
+                    <a href="/" id="logout">Выход</a>
+                </nav>
+                `;
+            };
+            document.getElementById('logout').addEventListener('click', () => {
+                localStorage.removeItem('token');
+                window.location.href = "/";
+            });
+        } else if(userRole === "Admin"){
             if(passesMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
@@ -160,233 +163,6 @@ const updateHeader = async () => {
                 localStorage.removeItem('token');
                 window.location.href = "/";
             });
-        } else if(userRoles.isStudent && userRoles.isTeacher){
-            const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
-            const teacherStudentMatch = currentPath.match(/^\/teacher-student\/(.+)$/);
-            const passesMatch = currentPath.match(/^\/passes-teacher\/(.+)$/);
-            if(absencesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/teacher-student/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(passesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/teacher-student/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(teacherStudentMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else {
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/teacher-student/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            };
-            document.getElementById('logout').addEventListener('click', () => {
-                localStorage.removeItem('token');
-                window.location.href = "/";
-            });
-        } else if(userRoles.isStudent){
-            const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
-            const studentMatch = currentPath.match(/^\/student\/(.+)$/);
-            if(absencesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/student/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(studentMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else {
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/student/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            };
-            document.getElementById('logout').addEventListener('click', () => {
-                localStorage.removeItem('token');
-                window.location.href = "/";
-            });
-        } else if(userRoles.isTeacher && userRoles.isDean){
-            const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
-            const teacherDeanMatch = currentPath.match(/^\/dean-teacher\/(.+)$/);
-            const passesMatch = currentPath.match(/^\/passes-dean\/(.+)$/);
-            if(absencesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(passesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(teacherDeanMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else {
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            };
-            document.getElementById('logout').addEventListener('click', () => {
-                localStorage.removeItem('token');
-                window.location.href = "/";
-            });
-        } else if(userRoles.isDean){
-            const passesMatch = currentPath.match(/^\/passes-dean\/(.+)$/)
-            const deanMatch = currentPath.match(/^\/dean\/(.+)$/)
-            if(passesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/dean/${encodeURIComponent(user.email)}">Пользователи</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if (deanMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else {
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            };
-            document.getElementById('logout').addEventListener('click', () => {
-                localStorage.removeItem('token');
-                window.location.href = "/";
-            });
-        } else if (userRoles.isTeacher){
-            const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
-            const teacherStudentMatch = currentPath.match(/^\/teacher\/(.+)$/);
-            const passesMatch = currentPath.match(/^\/passes-teacher\/(.+)$/);
-            if(absencesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(passesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(teacherStudentMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else {
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            };
-            document.getElementById('logout').addEventListener('click', () => {
-                localStorage.removeItem('token');
-                window.location.href = "/";
-            });
-        } else {
-            const userMatch = currentPath.match(/^\/user\/(.+)$/);
-            if(userMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else {
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/user/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            }
-            document.getElementById('logout').addEventListener('click', () => {
-                localStorage.removeItem('token');
-                window.location.href = "/";
-            });
         }
     } else {
         let navLinks = '';
@@ -414,6 +190,7 @@ const locationHandler = async () => {
     if (location.length === 0) location = "/";
 
     const token = localStorage.getItem('token');
+    const user = token ? parseJwt(token) : null;
     const isAuthtorized = await checkTokenValidity();
 
     if (!isAuthtorized && location !== "/login" && location !== "/registration" && location !== "/") {
@@ -422,93 +199,26 @@ const locationHandler = async () => {
         window.location.href = "/login";
         return;
     }
-    if (isAuthtorized && token !== null) {
-        const userRoles = await fetchRoles();
-        if(userRoles.isAdmin){
-            const adminMatch = location.match(/^\/admin\/(.+)$/);
-            if (adminMatch) {
-                const html = await fetch("/pages/admin.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Админ | " + urlPageTitle;
-                try {
-                    await loadScript("js/admin.js");
-                    console.log("Скрипт загружен.");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-            const passesMatch = location.match(/^\/passes\/(.+)$/);
-            if (passesMatch) {
-                const html = await fetch("/pages/passes.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Пропуски студентов | " + urlPageTitle;
-                try {
-                    await loadScript("js/passes.js");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-        } else if (userRoles.isStudent && userRoles.isTeacher){
-            const absencesMatch = location.match(/^\/absences\/(.+)$/);
-            if(absencesMatch){
-                const html = await fetch("/pages/absences.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Мои пропуски | " + urlPageTitle;
-
-                try {
-                    await loadScript("js/absences.js");
-                    console.log("Скрипт загружен.");
-                } catch (error) {
-                    console.error("Ошибка загрузки скрипта", error);
-                }
-
-                await updateHeader();
-                return;
-            }
-            const teacherStudentMatch = location.match(/^\/teacher-student\/(.+)$/);
-            if(teacherStudentMatch){
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Личный кабинет | " + urlPageTitle;
-                try {
-                    await loadScript("js/teacher.js");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-            const passesMatch = location.match(/^\/passes-teacher\/(.+)$/);
-            if (passesMatch){
-                const html = await fetch("/pages/passes.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Пропуски студентов | " + urlPageTitle;
-                try {
-                    await loadScript("js/passes.js");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-        } else if(userRoles.isStudent){
+    if (isAuthtorized && user !== null) {
+        const userRole = user["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+        if(userRole === "Student"){
             const studentMatch = location.match(/^\/student\/(.+)$/);
             if (studentMatch) {
+                const studentEmail = decodeURIComponent(studentMatch[1]);
+                console.log("Email студента из URL:", studentEmail);
                 const html = await fetch("/pages/student.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
-                document.title = "Личный кабинет | " + urlPageTitle;
+                document.title = "Студент | " + urlPageTitle;
                 try {
                     await loadScript("js/student.js");
+                    console.log("Скрипт загружен.");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
                 await updateHeader();
                 return;
             }
+        
             const absencesMatch = location.match(/^\/absences\/(.+)$/);
             if (absencesMatch) {
                 const html = await fetch("/pages/absences.html").then(res => res.text());
@@ -525,129 +235,28 @@ const locationHandler = async () => {
                 await updateHeader();
                 return;
             }
-        } else if(userRoles.isDean && userRoles.isTeacher){
-            const absencesMatch = location.match(/^\/absences\/(.+)$/);
-            if(absencesMatch){
-                const html = await fetch("/pages/absences.html").then(res => res.text());
+        }
+        if(userRole === "Admin"){
+            const adminMatch = location.match(/^\/admin\/(.+)$/);
+            if (adminMatch) {
+                const html = await fetch("/pages/admin.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
-                document.title = "Мои пропуски | " + urlPageTitle;
-
+                document.title = "Пользователи | " + urlPageTitle;
                 try {
-                    await loadScript("js/absences.js");
-                    console.log("Скрипт загружен.");
-                } catch (error) {
-                    console.error("Ошибка загрузки скрипта", error);
-                }
-
-                await updateHeader();
-                return;
-            }
-            const teacherDeanMatch = location.match(/^\/dean-teacher\/(.+)$/);
-            if (teacherDeanMatch) {
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Личный кабинет | " + urlPageTitle;
-                try {
-                    await loadScript("js/teacher.js");
+                    await loadScript("js/admin.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
                 await updateHeader();
                 return;
             }
-            const passesMatch = location.match(/^\/passes-dean\/(.+)$/);
-            if(passesMatch){
+            const passesMatch = location.match(/^\/passes\/(.+)$/);
+            if (passesMatch) {
                 const html = await fetch("/pages/passes.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
                 document.title = "Пропуски студентов | " + urlPageTitle;
                 try {
                     await loadScript("js/passes.js");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-            const deanMatch = location.match(/^\/dean\/(.+)$/)
-            if (deanMatch){
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Личный кабинет | " + urlPageTitle;
-                try {
-                    await loadScript("js/teacher.js");
-                    console.log("Скрипт загружен.");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-        } else if(userRoles.isDean){
-            const passesMatch = location.match(/^\/passes-dean\/(.+)$/)
-            if (passesMatch){
-                const html = await fetch("/pages/passes.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Пропуски студентов | " + urlPageTitle;
-                try {
-                    await loadScript("js/passes.js");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-        } else if(userRoles.isTeacher){
-            const absencesMatch = location.match(/^\/absences\/(.+)$/);
-            if(absencesMatch){
-                const html = await fetch("/pages/absences.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Мои пропуски | " + urlPageTitle;
-
-                try {
-                    await loadScript("js/absences.js");
-                    console.log("Скрипт загружен.");
-                } catch (error) {
-                    console.error("Ошибка загрузки скрипта", error);
-                }
-
-                await updateHeader();
-                return;
-            }
-            const teacherStudentMatch = location.match(/^\/teacher\/(.+)$/);
-            if(teacherStudentMatch){
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Личный кабинет | " + urlPageTitle;
-                try {
-                    await loadScript("js/teacher.js");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-            const passesMatch = location.match(/^\/passes-teacher\/(.+)$/);
-            if(passesMatch) {
-                const html = await fetch("/pages/passes.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Пропуски студентов | " + urlPageTitle;
-                try {
-                    await loadScript("js/passes.js");
-                } catch (error) {
-                    console.error("Ошибка при загрузке скрипта", error);
-                }
-                await updateHeader();
-                return;
-            }
-        } else {
-            const pendingMatch = location.match(/^\/user\/(.+)$/)
-            if (pendingMatch) {
-                const html = await fetch("/pages/pending.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Внимание! | " + urlPageTitle;
-                try {
-                    await loadScript("js/pending.js");
-                    console.log("Скрипт загружен.");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }

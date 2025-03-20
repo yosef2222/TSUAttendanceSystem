@@ -40,10 +40,9 @@ console.log("скрипт выполняется");
 
 function displayStudentInfo(userData) {
     const studentNameElement = document.getElementById("studentName");
-    const studentGroupElement = document.getElementById("studentGroup")
+
     if (studentNameElement) {
         studentNameElement.textContent = userData.fullName;
-        studentGroupElement.textContent = userData.groupNumber;
         console.log("Информация о студенте обновлена!");
     } else {
         console.error("Ошибка: Элемент с id 'studentName' не найден в DOM");
