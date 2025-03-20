@@ -15,7 +15,6 @@ class SettingViewController: UIViewController {
         self.navigationItem.setHidesBackButton(true, animated: false)
         view.backgroundColor = .black
         
-        // Заголовок "Настройки"
         let textLabel = UILabel()
         textLabel.text = "Настройки"
         textLabel.textColor = .white
@@ -25,12 +24,10 @@ class SettingViewController: UIViewController {
         textLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(textLabel)
         
-        // NameView
         let nameView = NameView()
         nameView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nameView)
 
-        // Кнопка выхода
         let logoutButton = UIButton(type: .system)
         logoutButton.setTitle("Выйти", for: .normal)
         logoutButton.setTitleColor(.white, for: .normal)
@@ -41,7 +38,6 @@ class SettingViewController: UIViewController {
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoutButton)
 
-        // Констрейнты
         NSLayoutConstraint.activate([
             textLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             textLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 76),
@@ -59,16 +55,12 @@ class SettingViewController: UIViewController {
         ])
     }
 
-    // Обработка нажатия на кнопку выхода
     @objc private func logoutButtonTapped() {
-        // Удаляем токен из локального хранилища
         TokenManager.shared.deleteToken()
         
-        // Переход на экран регистрации
         navigateToRegistrationScreen()
     }
 
-    // Переход на экран регистрации
     private func navigateToRegistrationScreen() {
         TokenManager.shared.deleteToken()
         let registrationViewController = RegisterController() // Замените на ваш экран регистрации

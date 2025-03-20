@@ -5,8 +5,6 @@
 //  Created by Gleb Korotkov on 21.02.2025.
 //
 
-
-
 import UIKit
 
 class RegisterController: UIViewController {
@@ -88,9 +86,10 @@ class RegisterController: UIViewController {
             button.addTarget(self, action: #selector(LoginToDbButtonTaped), for: .touchUpInside)
         }
         
-        if let button = RegView.subviews.first(where: { $0 is UIButton }) as? UIButton {
+        if let button = RegView.subviews.first(where: { $0 is UIButton && ($0 as! UIButton).titleLabel?.text == "Зарегистрироваться" }) as? UIButton {
             button.addTarget(self, action: #selector(RegisterToDbButtonTaped), for: .touchUpInside)
         }
+        
         
         NSLayoutConstraint.activate([
             RegView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -107,6 +106,13 @@ class RegisterController: UIViewController {
         let gradientView = AnimatedGradientView(frame: view.bounds)
         view.addSubview(gradientView)
         view.sendSubviewToBack(gradientView)
+    }
+    
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     @objc func LoginButtonTaped() {
@@ -142,16 +148,37 @@ class RegisterController: UIViewController {
     }
     
     @objc func RegisterToDbButtonTaped() {
-        guard let name = RegView.nameField.text, !name.isEmpty,
-              let email = RegView.emailField.text, !email.isEmpty,
-              let password = RegView.passwordField.text, !password.isEmpty else {
-            print("Заполните все поля")
+        guard let name = RegView.nameField.text, !name.isEmpty else {
+            showAlert(title: "Ошибка", message: "Введите ФИО")
+            return
+        }
+        
+        guard let email = RegView.emailField.text, !email.isEmpty else {
+            showAlert(title: "Ошибка", message: "Введите email")
+            return
+        }
+        
+        guard let password = RegView.passwordField.text, !password.isEmpty else {
+            showAlert(title: "Ошибка", message: "Введите пароль")
+            return
+        }
+        
+        if RegView.isStudent, let groupNumber = RegView.groupField.text, groupNumber.isEmpty {
+            showAlert(title: "Ошибка", message: "Введите номер группы")
             return
         }
         
         let isStudent = RegView.isStudent
-        
-        let user = UserDto(fullName: name, birthday: "2000-01-01", email: email, password: password, isStudent: isStudent)
+        let groupNumber = isStudent ? RegView.groupField.text : nil
+        print("group -" + groupNumber!)
+        let user = UserDto(
+            fullName: name,
+            birthday: "2000-01-01",
+            email: email,
+            password: password,
+            groupNumber: groupNumber == nil ? "none" : groupNumber,
+            isStudent: isStudent
+        )
         
         AuthService.shared.register(user: user) { result in
             switch result {
@@ -164,7 +191,7 @@ class RegisterController: UIViewController {
                     self.present(tabBarController, animated: true, completion: nil)
                 }
             case .failure(let error):
-                print("Ошибка регистрации: \(error)")
+                self.showAlert(title: "Ошибка", message: "Ошибка регистрации: \(error.localizedDescription)")
             }
         }
     }

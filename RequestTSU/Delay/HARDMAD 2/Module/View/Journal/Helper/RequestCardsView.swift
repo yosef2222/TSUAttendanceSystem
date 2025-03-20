@@ -7,14 +7,14 @@
 
 import UIKit
 
-class EmotionCardsView: UIView {
-    private let contentView = UIView()
-    
-    var emotionCards: [UIView] = [] {
+class RequestCardsView: UIView {
+    var emotionCards: [RequestCardView] = [] {
         didSet {
             updateCards()
         }
     }
+    
+    private let contentView = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -38,10 +38,9 @@ class EmotionCardsView: UIView {
     }
     
     private func updateCards() {
-        
         contentView.subviews.forEach { $0.removeFromSuperview() }
         
-        var previousCard: UIView?
+        var previousCard: RequestCardView?
         
         for card in emotionCards {
             card.translatesAutoresizingMaskIntoConstraints = false
@@ -50,9 +49,9 @@ class EmotionCardsView: UIView {
             NSLayoutConstraint.activate([
                 card.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
                 card.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-                card.heightAnchor.constraint(equalToConstant: 156)
+                card.heightAnchor.constraint(equalToConstant: 156),
+                card.widthAnchor.constraint(equalToConstant: 340)
             ])
-            
             
             if let previousCard = previousCard {
                 card.topAnchor.constraint(equalTo: previousCard.bottomAnchor, constant: 16).isActive = true

@@ -85,8 +85,8 @@ class NameView: UIView {
             nameLabel.font = UIFont(name: "VelaSansGX-ExtraLight_Regular", size: 18)
             roleLabel.font = UIFont(name: "VelaSansGX-ExtraLight_Regular", size: 14)
         } else {
-            nameLabel.font = UIFont(name: "VelaSansGX-ExtraLight_Regular", size: 24)
-            roleLabel.font = UIFont(name: "VelaSansGX-ExtraLight_Regular", size: 16)
+            nameLabel.font = UIFont(name: "VelaSansGX-ExtraLight_Regular", size: 34)
+            roleLabel.font = UIFont(name: "VelaSansGX-ExtraLight_Regular", size: 24)
         }
         
         // Загрузите данные профиля и роли
@@ -113,7 +113,9 @@ class NameView: UIView {
         var rolesArray = [String]()
         
         if roles.isStudent {
-            rolesArray.append("Студент")
+            if let profile = profile {
+                rolesArray.append("Студент \(profile.groupNumber)")
+            }
         }
         if roles.isTeacher {
             rolesArray.append("Учитель")

@@ -36,6 +36,8 @@ class LoginButtons: UIView {
         emailField.tintColor = .black
         emailField.backgroundColor = .white
         emailField.textColor = .black
+        emailField.autocapitalizationType = .none
+        emailField.autocorrectionType = .no
         emailField.translatesAutoresizingMaskIntoConstraints = false
         
         emailField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
@@ -55,6 +57,8 @@ class LoginButtons: UIView {
         passwordField.backgroundColor = .white
         passwordField.textColor = .black
         passwordField.isSecureTextEntry = true
+        passwordField.autocapitalizationType = .none
+        passwordField.autocorrectionType = .no
         passwordField.translatesAutoresizingMaskIntoConstraints = false
         
         passwordField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))

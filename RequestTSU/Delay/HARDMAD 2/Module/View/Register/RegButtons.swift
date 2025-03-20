@@ -15,8 +15,13 @@ class RegButtons: UIView {
     let nameField = UITextField()
     let emailField = UITextField()
     let passwordField = UITextField()
+    let groupField = UITextField()
     
-    var isStudent: Bool = false
+    var isStudent: Bool = false {
+        didSet {
+            updateGroupFieldState() // Обновляем состояние groupField при изменении isStudent
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,6 +34,7 @@ class RegButtons: UIView {
     }
     
     private func setupView() {
+        // Настройка nameField
         nameField.attributedPlaceholder = NSAttributedString(
             string: "ФИО",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
@@ -41,12 +47,13 @@ class RegButtons: UIView {
         nameField.backgroundColor = .white
         nameField.textColor = .black
         nameField.translatesAutoresizingMaskIntoConstraints = false
-        
+        nameField.autocapitalizationType = .none
+        nameField.autocorrectionType = .no
         nameField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         nameField.leftViewMode = .always
-        
         addSubview(nameField)
         
+        // Настройка emailField
         emailField.attributedPlaceholder = NSAttributedString(
             string: "email",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
@@ -59,12 +66,14 @@ class RegButtons: UIView {
         emailField.backgroundColor = .white
         emailField.textColor = .black
         emailField.translatesAutoresizingMaskIntoConstraints = false
-        
+        emailField.autocapitalizationType = .none
+        emailField.autocorrectionType = .no
+        emailField.keyboardType = .emailAddress
         emailField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         emailField.leftViewMode = .always
-        
         addSubview(emailField)
         
+        // Настройка passwordField
         passwordField.attributedPlaceholder = NSAttributedString(
             string: "пароль",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
@@ -78,11 +87,33 @@ class RegButtons: UIView {
         passwordField.textColor = .black
         passwordField.isSecureTextEntry = true
         passwordField.translatesAutoresizingMaskIntoConstraints = false
-        
+        passwordField.autocapitalizationType = .none
+        passwordField.autocorrectionType = .no
         passwordField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         passwordField.leftViewMode = .always
-        
         addSubview(passwordField)
+        
+        // Настройка groupField
+        groupField.attributedPlaceholder = NSAttributedString(
+            string: "Номер группы",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
+        )
+        groupField.font = UIFont.systemFont(ofSize: 16)
+        groupField.delegate = self
+        groupField.layer.cornerRadius = 15
+        groupField.layer.masksToBounds = true
+        groupField.tintColor = .black
+        groupField.backgroundColor = .white
+        groupField.textColor = .black
+        groupField.isSecureTextEntry = false
+        groupField.translatesAutoresizingMaskIntoConstraints = false
+        groupField.autocapitalizationType = .none
+        groupField.autocorrectionType = .no
+        groupField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
+        groupField.leftViewMode = .always
+        addSubview(groupField)
+        
+        updateGroupFieldState()
         
         StudentButton.setTitle("Я студент", for: .normal)
         StudentButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
@@ -105,9 +136,9 @@ class RegButtons: UIView {
         registrationButton.clipsToBounds = true
         registrationButton.layer.zPosition = 1
         registrationButton.translatesAutoresizingMaskIntoConstraints = false
-        
         addSubview(registrationButton)
         
+        // Констрейнты
         NSLayoutConstraint.activate([
             nameField.topAnchor.constraint(equalTo: topAnchor, constant: 20),
             nameField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
@@ -124,7 +155,12 @@ class RegButtons: UIView {
             passwordField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             passwordField.heightAnchor.constraint(equalToConstant: 50),
             
-            StudentButton.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 24),
+            groupField.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 16),
+            groupField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            groupField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            groupField.heightAnchor.constraint(equalToConstant: 50),
+            
+            StudentButton.topAnchor.constraint(equalTo: groupField.bottomAnchor, constant: 24),
             StudentButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             StudentButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             StudentButton.heightAnchor.constraint(equalToConstant: 70),
@@ -137,22 +173,29 @@ class RegButtons: UIView {
     }
     
     @objc private func studentButtonTapped() {
-            isStudent.toggle() // Меняем состояние isStudent
-            updateStudentButtonAppearance() // Обновляем внешний вид кнопки
-        }
-        
-        // Обновление внешнего вида кнопки "Я студент"
-        private func updateStudentButtonAppearance() {
-            UIView.animate(withDuration: 0.3) {
-                if self.isStudent {
-                    self.StudentButton.backgroundColor = .lightGray
-                    self.StudentButton.setTitleColor(.white, for: .normal)
-                } else {
-                    self.StudentButton.backgroundColor = .white
-                    self.StudentButton.setTitleColor(.black, for: .normal)
-                }
+        isStudent.toggle() // Меняем состояние isStudent
+        updateStudentButtonAppearance() // Обновляем внешний вид кнопки
+        updateGroupFieldState() // Обновляем состояние groupField
+    }
+    
+    // Обновление внешнего вида кнопки "Я студент"
+    private func updateStudentButtonAppearance() {
+        UIView.animate(withDuration: 0.3) {
+            if self.isStudent {
+                self.StudentButton.backgroundColor = .lightGray
+                self.StudentButton.setTitleColor(.white, for: .normal)
+            } else {
+                self.StudentButton.backgroundColor = .white
+                self.StudentButton.setTitleColor(.black, for: .normal)
             }
         }
+    }
+    
+    // Обновление состояния groupField
+    private func updateGroupFieldState() {
+        groupField.isUserInteractionEnabled = isStudent // Включаем или отключаем взаимодействие
+        groupField.alpha = isStudent ? 1.0 : 0.5 // Меняем прозрачность для визуального отключения
+    }
 }
 
 extension RegButtons: UITextFieldDelegate {

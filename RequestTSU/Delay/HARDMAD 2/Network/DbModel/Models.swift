@@ -12,6 +12,7 @@ struct UserDto: Codable {
     let birthday: String
     let email: String
     let password: String
+    let groupNumber: String?
     let isStudent: Bool
 }
 
@@ -33,10 +34,15 @@ struct RequestModel: Codable {
     let files: [Data]?
 }
 
+struct RequestModels: Codable {
+    let RequestModels: [RequestModel]
+}
+
 struct Profile: Codable {
     let fullName: String
     let email: String
     let birthDate: String
+    let groupNumber: String
 }
 
 struct Role: Codable {
@@ -44,4 +50,27 @@ struct Role: Codable {
     let isAdmin: Bool
     let isDean: Bool
     let isTeacher: Bool
+}
+
+struct Absence: Codable {
+    let id: String
+    let reason: String
+    let absenceDateStart: String
+    let absenceDateEnd: String
+    let status: String
+    let studentFullName: String
+    let reviewedByFullName: String?
+    let fileIds: [String]
+}
+
+
+struct ApprovedRequest: Codable {
+    let id: String
+    let reason: String
+    let absenceDateStart: String
+    let absenceDateEnd: String
+    let status: String
+    let studentFullName: String
+    let reviewedByFullName: String
+    let fileIds: [String]
 }

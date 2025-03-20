@@ -70,6 +70,7 @@ class NotesController: UIViewController, NotesViewOneDayDelegate {
     }
     
     @objc func SuccessButtonTaped() {
+        
         print("StartTime: \(notesViewOneDay.StartTime.text ?? "не заполнено")")
         print("EndTime: \(notesViewOneDay.EndTime.text ?? "не заполнено")")
         print("Reason: \(notesViewOneDay.textField.text ?? "не заполнено")")
@@ -110,6 +111,12 @@ class NotesController: UIViewController, NotesViewOneDayDelegate {
         } catch {
             print("Ошибка при чтении файла: \(error.localizedDescription)")
         }
+        
+        let notesController = TabBarController()
+        notesController.hidesBottomBarWhenPushed = true
+        notesController.isModalInPresentation = true
+        notesController.modalPresentationStyle = .fullScreen
+        self.present(notesController, animated: false, completion: nil)
     }
     func didSelectFile(fileURL: URL) {
             print("Файл выбран в контроллере: \(fileURL.lastPathComponent)")

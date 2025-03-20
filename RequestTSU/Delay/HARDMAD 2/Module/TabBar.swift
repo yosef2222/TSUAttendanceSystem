@@ -13,7 +13,6 @@ class TabBarController: UITabBarController {
         super.viewDidLoad()
         self.navigationItem.setHidesBackButton(true, animated: false)
         
-        // Загружаем роли и настраиваем вкладки
         loadRolesAndSetupTabs()
         
         let appearance = UITabBarAppearance()
@@ -39,11 +38,9 @@ class TabBarController: UITabBarController {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let roles):
-                    // Настраиваем вкладки в зависимости от ролей
                     self?.setupTabs(with: roles)
                 case .failure(let error):
                     print("Ошибка загрузки ролей: \(error.localizedDescription)")
-                    // По умолчанию показываем только две вкладки
                     self?.setupTabs(with: nil)
                 }
             }
@@ -54,12 +51,10 @@ class TabBarController: UITabBarController {
         let journal = self.createNav(with: "Журнал", and: UIImage(named: "Notebook"), vc: JournalController())
         let settings = self.createNav(with: "Настройки", and: UIImage(named: "Settings"), vc: SettingViewController())
         
-        // Проверяем, есть ли у пользователя роль Admin или Dean
-        if let roles = roles, (roles.isAdmin || roles.isDean) {
-            let statistics = self.createNav(with: "Статистика", and: UIImage(named: "Data Area"), vc: StatisticsViewController())
+        if let roles = roles, (roles.isTeacher) {
+            let statistics = self.createNav(with: "Статистика", and: UIImage(named: "Data Area"), vc: StaticViewController())
             self.setViewControllers([journal, statistics, settings], animated: true)
         } else {
-            // Если роли Admin или Dean отсутствуют, показываем только две вкладки
             self.setViewControllers([journal, settings], animated: true)
         }
     }
