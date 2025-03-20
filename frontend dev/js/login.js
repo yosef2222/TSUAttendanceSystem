@@ -1,23 +1,28 @@
-function parseJwt(token) {
+async function fetchRoles() {
     try {
-        if (!token) return null;
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("Токен авторизации отсутствует");
+            return null;
+        }
 
-        const base64Url = token.split('.')[1];
-        if (!base64Url) throw new Error("Некорректный формат токена");
+        const response = await fetch("http://localhost:5163/User/roles", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        ).join(''));
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.statusText}`);
+        }
 
-        const payload = JSON.parse(jsonPayload);
-        return payload;
-    } catch (e) {
-        console.error("Ошибка декодирования JWT:", e);
+        return await response.json();
+    } catch (error) {
+        console.error("Ошибка при получении ролей", error);
         return null;
     }
 }
-
 
 if (document.getElementById('loginForm')) {
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
@@ -44,28 +49,31 @@ if (document.getElementById('loginForm')) {
 
             localStorage.setItem('token', data.token);
 
-            const user = parseJwt(data.token);
-            if (!user) throw new Error("Ошибка при разборе токена.");
-
             alert('Вход выполнен успешно!');
-            const userRole = user["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-            if (userRole === "Student") {
-                const studentUrl = `/student/${encodeURIComponent(user.email)}`;
-                window.history.pushState({}, "", studentUrl);
-                locationHandler();
-            } else if (userRole === "Admin"){
-                const adminUrl = `/admin/${encodeURIComponent(user.email)}`;
-                window.history.pushState({}, "", adminUrl);
-                locationHandler();
-            } else if (userRole === "Dean"){
-                const adminUrl = `/dean/${encodeURIComponent(user.email)}`;
-                window.history.pushState({}, "", adminUrl);
-                locationHandler();
-            } else{
-                const adminUrl = `/teacher/${encodeURIComponent(user.email)}`;
-                window.history.pushState({}, "", adminUrl);
-                locationHandler();
-            } 
+
+            const roles = await fetchRoles();
+            if (!roles) {
+                throw new Error("Не удалось получить роли пользователя.");
+            }
+
+            if (roles.isAdmin) {
+                window.history.pushState({}, "", `/admin/${encodeURIComponent(email)}`);
+            } else if (roles.isStudent && roles.isTeacher) {
+                window.history.pushState({}, "", `/teacher-student/${encodeURIComponent(email)}`);
+            } else if (roles.isStudent) {
+                window.history.pushState({}, "", `/student/${encodeURIComponent(email)}`);
+            } else if (roles.isTeacher && roles.isDean) {
+                window.history.pushState({}, "", `/dean-teacher/${encodeURIComponent(email)}`);
+            } else if (roles.isDean) {
+                window.history.pushState({}, "", `/dean/${encodeURIComponent(email)}`);
+            } else if (roles.isTeacher) {
+                window.history.pushState({}, "", `/teacher/${encodeURIComponent(email)}`);
+            }else {
+                window.history.pushState({}, "", `/user/${encodeURIComponent(email)}`)
+            }
+
+            locationHandler();
+
         } catch (error) {
             alert(error.message);
         }

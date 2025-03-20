@@ -6,13 +6,19 @@ if (document.getElementById('registerForm')) {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const birthday = new Date().toISOString();
-        const isStudent = true;
+        const groupNumber = document.getElementById('group').value;
+        const role = document.getElementById('role').value;
+        let isStudent = false;
+        if(role === "student"){
+            isStudent = true;
+        }
 
         const newUser = {
             fullName,
             email,
             password,
             birthday,
+            groupNumber,
             isStudent
         };
 
@@ -39,3 +45,12 @@ if (document.getElementById('registerForm')) {
         }
     });
 }
+document.getElementById("role").addEventListener("change", function() {
+    const groupContainer = document.getElementById("groupContainer");
+    if (this.value === "student") {
+        groupContainer.style.display = "block";
+    } else {
+        groupContainer.style.display = "none";
+        document.getElementById("group").value = "other";
+    }
+});
