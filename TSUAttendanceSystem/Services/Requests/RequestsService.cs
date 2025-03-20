@@ -83,13 +83,21 @@ public class RequestsService : IRequestsService
         return requests;
     }
 
-    public async Task<List<RequestDetailsDto>> GetPendingRequestsAsync()
+    public async Task<List<RequestDetailsDto>> GetPendingRequestsAsync(string groupNumber = null)
     {
-        var requests = await _context.Requests
+        var query = _context.Requests
             .Where(r => r.Status == RequestStatus.Pending)
-            .Include(r => r.Student)
-            .Include(r => r.ReviewedBy)
-            .Include(r => r.Files)
+            .Include(r => r.Student)  
+            .Include(r => r.ReviewedBy)  
+            .Include(r => r.Files)  
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(groupNumber))
+        {
+            query = query.Where(r => r.Student.GroupNumber == groupNumber);
+        }
+
+        var requests = await query
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
@@ -106,6 +114,9 @@ public class RequestsService : IRequestsService
 
         return requests;
     }
+
+
+
 
     public async Task<Request> EditRequestEndDateAsync(Guid userId, Guid requestId, EditRequestEndDateDto requestDto, List<IFormFile> files)
     {
@@ -206,13 +217,22 @@ public class RequestsService : IRequestsService
         return file;
     }
     
-    public async Task<List<RequestDetailsDto>> GetApprovedRequestsAsync()
+    public async Task<List<RequestDetailsDto>> GetApprovedRequestsAsync(string? groupNumber)
     {
-        var requests = await _context.Requests
-            .Where(r => r.Status == RequestStatus.Approved)
-            .Include(r => r.Student)
-            .Include(r => r.ReviewedBy)
-            .Include(r => r.Files)
+        
+        var query = _context.Requests
+            .Where(r => r.Status == RequestStatus.Approved)  
+            .Include(r => r.Student)  
+            .Include(r => r.ReviewedBy)  
+            .Include(r => r.Files)  
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(groupNumber))
+        {
+            query = query.Where(r => r.Student.GroupNumber == groupNumber);
+        }
+
+        var requests = await query
             .Select(r => new RequestDetailsDto
             {
                 Id = r.Id,
@@ -229,5 +249,7 @@ public class RequestsService : IRequestsService
 
         return requests;
     }
+
+
     
 }

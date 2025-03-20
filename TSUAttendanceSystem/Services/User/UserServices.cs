@@ -16,27 +16,30 @@ public class UserService : IUserService
         _context = context;
     }
 
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<List<User>> GetAllUsers(string? fullName)
     {
-        var users = await _context.Users
-            .Include(u => u.Role) 
-            .Select(u => new
+        var usersQuery = _context.Users
+            .Include(u => u.Role)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(fullName))
+        {
+            usersQuery = usersQuery.Where(u => u.FullName.Contains(fullName));
+        }
+
+        var users = await usersQuery
+            .Select(u => new User
             {
                 Id = u.Id,
                 FullName = u.FullName,
                 Email = u.Email,
-                Roles = new 
-                {
-                    IsStudent = u.Role.IsStudent,
-                    IsTeacher = u.Role.IsTeacher,
-                    IsAdmin = u.Role.IsAdmin,
-                    IsDean = u.Role.IsDean
-                }
+                Role = u.Role 
             })
             .ToListAsync();
-    
-        return new OkObjectResult(users);
+
+        return users;
     }
+
 
     public async Task<IActionResult> GetUserRoles(Guid userId)
     {

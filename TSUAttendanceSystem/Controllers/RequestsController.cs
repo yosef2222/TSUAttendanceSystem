@@ -45,11 +45,13 @@ public class RequestsController : ControllerBase
 
     [Authorize(Roles = "Admin, Dean")]
     [HttpGet("pending")]
-    public async Task<IActionResult> GetPendingRequests()
+    public async Task<IActionResult> GetPendingRequests([FromQuery] string? groupNumber)
     {
-        var requests = await _requestsService.GetPendingRequestsAsync();
+        var requests = await _requestsService.GetPendingRequestsAsync(groupNumber);
+
         return Ok(requests);
     }
+
 
     [Authorize(Roles = "Student, Admin")]
     [HttpPut("{id}/edit-end-date")]
@@ -105,10 +107,12 @@ public class RequestsController : ControllerBase
 
     [Authorize(Roles = "Admin, Dean, Teacher")]
     [HttpGet("approved")]
-    public async Task<IActionResult> GetApprovedRequests()
+    public async Task<ActionResult<List<RequestDetailsDto>>> GetApprovedRequests([FromQuery] string? groupNumber)
     {
-        var requests = await _requestsService.GetApprovedRequestsAsync();
+        var requests = await _requestsService.GetApprovedRequestsAsync(groupNumber);
+
         return Ok(requests);
     }
+
 
 }

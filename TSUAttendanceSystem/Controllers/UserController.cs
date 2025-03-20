@@ -22,15 +22,12 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = "Admin,Dean")]
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers([FromQuery] string? fullName)
     {
-        var userId = Guid.Parse(User.FindFirst("Id")?.Value);
-        var user = await _context.Users
-            .Include(u => u.Role)
-            .SingleOrDefaultAsync(u => u.Id == userId);
-
-        return await _userService.GetAllUsers();
+        var users = await _userService.GetAllUsers(fullName);
+        return Ok(users);
     }
+    
 
     [Authorize]
     [HttpGet("roles")]
