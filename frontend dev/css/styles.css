@@ -153,9 +153,3 @@ button.delete:hover {
   font-weight: bold;
   cursor: pointer;
 }
-.reason {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
-  max-width: 300px;  
-}
