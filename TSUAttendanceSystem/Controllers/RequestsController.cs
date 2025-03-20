@@ -16,8 +16,9 @@ public class RequestsController : ControllerBase
     {
         _requestsService = requestsService;
     }
-
-    [HttpPost]
+    
+    [Authorize(Roles = "Student, Admin")]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateRequest([FromForm] CreateRequestDto requestDto, [FromForm] List<IFormFile> files)
     {
         var userId = GetUserId();
@@ -30,7 +31,7 @@ public class RequestsController : ControllerBase
         return CreatedAtAction(nameof(GetMyRequests), new { id = request.Id }, request);
     }
 
-    [Authorize(Roles = "Student, Teacher, Admin, Dean")]
+    [Authorize(Roles = "Student, Admin")]
     [HttpGet("my")]
     public async Task<IActionResult> GetMyRequests()
     {
@@ -50,7 +51,7 @@ public class RequestsController : ControllerBase
         return Ok(requests);
     }
 
-    [Authorize(Roles = "Student, Teacher, Admin")]
+    [Authorize(Roles = "Student, Admin")]
     [HttpPut("{id}/edit-end-date")]
     public async Task<IActionResult> EditRequestEndDate(Guid id, [FromForm] EditRequestEndDateDto requestDto, [FromForm] List<IFormFile> files)
     {
