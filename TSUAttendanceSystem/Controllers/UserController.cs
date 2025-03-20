@@ -1,25 +1,26 @@
-using CampusCourses1.Controllers;
 using TSUAttendanceSystem.Data;
 using TSUAttendanceSystem.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace TSUAttendanceSystem.Controllers;
 
+namespace TSUAttendanceSystem.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController : BaseController
+public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ApplicationDbContext _context;
 
-    public UserController(IUserService userService, ApplicationDbContext context) : base(context)
+    public UserController(IUserService userService, ApplicationDbContext context)
     {
         _userService = userService;
+        _context = context;
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin,Dean")]
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers()
     {
@@ -27,12 +28,7 @@ public class UserController : BaseController
         var user = await _context.Users
             .Include(u => u.Role)
             .SingleOrDefaultAsync(u => u.Id == userId);
-        
-        if (user == null || !user.Role.IsAdmin)
-        {
-            return new ForbidResult(); 
-        }
-        
+
         return await _userService.GetAllUsers();
     }
 
@@ -41,7 +37,6 @@ public class UserController : BaseController
     public async Task<IActionResult> GetUserRoles()
     {
         var userId = Guid.Parse(User.FindFirst("Id")?.Value);
-        
         return await _userService.GetUserRoles(userId);
     }
 }
