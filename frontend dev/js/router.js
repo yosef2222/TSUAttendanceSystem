@@ -127,20 +127,32 @@ const updateHeader = async () => {
         const userRoles = await fetchRoles();
         const user = parseJwt(token);
         if(userRoles.isAdmin){
-            const adminMatch = currentPath.match(/^\/admin\/(.+)$/);
+            const usersMatch = currentPath.match(/^\/users\/(.+)$/);
             const passesMatch = currentPath.match(/^\/passes\/(.+)$/);
+            const passesApprovedMatch = currentPath.match(/^\/passes-approved\/(.+)$/);
             if(passesMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/admin/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
-            } else if(adminMatch){
+            } else if(usersMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
+                    <a href="/passes/${encodeURIComponent(user.email)}">Пропуски</a>
+                    <a href="/" id="logout">Выход</a>
+                </nav>
+                `;
+            } else if(passesApprovedMatch){
+                header.innerHTML = `
+                <a href="/">Система учета пропусков</a>
+                <nav>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
                     <a href="/passes/${encodeURIComponent(user.email)}">Пропуски</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
@@ -149,7 +161,8 @@ const updateHeader = async () => {
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/admin/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
                     <a href="/passes/${encodeURIComponent(user.email)}">Пропуски</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
@@ -163,17 +176,17 @@ const updateHeader = async () => {
         } else if(userRoles.isStudent && userRoles.isTeacher){
             const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
             const teacherStudentMatch = currentPath.match(/^\/teacher-student\/(.+)$/);
-            const passesMatch = currentPath.match(/^\/passes-teacher\/(.+)$/);
+            const passesApprovedMatch = currentPath.match(/^\/passes-approved\/(.+)$/);
             if(absencesMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/teacher-student/${encodeURIComponent(user.email)}">Личный кабинет</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
-            } else if(passesMatch){
+            } else if(passesApprovedMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
@@ -186,7 +199,7 @@ const updateHeader = async () => {
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
@@ -197,7 +210,7 @@ const updateHeader = async () => {
                 <nav>
                     <a href="/teacher-student/${encodeURIComponent(user.email)}">Личный кабинет</a>
                     <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -240,14 +253,16 @@ const updateHeader = async () => {
                 window.location.href = "/";
             });
         } else if(userRoles.isTeacher && userRoles.isDean){
-            const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
+            const passesApprovedMatch = currentPath.match(/^\/passes-approved\/(.+)$/);
             const teacherDeanMatch = currentPath.match(/^\/dean-teacher\/(.+)$/);
-            const passesMatch = currentPath.match(/^\/passes-dean\/(.+)$/);
-            if(absencesMatch){
+            const passesMatch = currentPath.match(/^\/passes\/(.+)$/);
+            const usersMatch = currentPath.match(/^\/users\/(.+)$/)
+            if(usersMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
                     <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
@@ -256,8 +271,9 @@ const updateHeader = async () => {
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
                     <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -265,8 +281,19 @@ const updateHeader = async () => {
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/passes/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
+                    <a href="/" id="logout">Выход</a>
+                </nav>
+                `;
+            } else if(passesApprovedMatch){
+                header.innerHTML = `
+                <a href="/">Система учета пропусков</a>
+                <nav>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
+                    <a href="/passes/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -274,9 +301,10 @@ const updateHeader = async () => {
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
                     <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -286,21 +314,33 @@ const updateHeader = async () => {
                 window.location.href = "/";
             });
         } else if(userRoles.isDean){
-            const passesMatch = currentPath.match(/^\/passes-dean\/(.+)$/)
-            const deanMatch = currentPath.match(/^\/dean\/(.+)$/)
+            const passesMatch = currentPath.match(/^\/passes\/(.+)$/)
+            const usersMatch = currentPath.match(/^\/users\/(.+)$/)
+            const passesApprovedMatch = currentPath.match(/^\/passes-approved\/(.+)$/)
             if(passesMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/dean/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые ропуски</a>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
-            } else if (deanMatch){
+            } else if(passesApprovedMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски</a>
+                    <a href="/passes/${encodeURIComponent(user.email)}">Пропуски</a>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/" id="logout">Выход</a>
+                </nav>
+                `;
+            } else if (usersMatch){
+                header.innerHTML = `
+                <a href="/">Система учета пропусков</a>
+                <nav>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
+                    <a href="/passses/${encodeURIComponent(user.email)}">Пропуски</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -308,9 +348,9 @@ const updateHeader = async () => {
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/dean-teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-dean/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Принятые пропуски</a>
+                    <a href="/users/${encodeURIComponent(user.email)}">Пользователи</a>
+                    <a href="/passes/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -320,24 +360,13 @@ const updateHeader = async () => {
                 window.location.href = "/";
             });
         } else if (userRoles.isTeacher){
-            const absencesMatch = currentPath.match(/^\/absences\/(.+)$/);
             const teacherStudentMatch = currentPath.match(/^\/teacher\/(.+)$/);
-            const passesMatch = currentPath.match(/^\/passes-teacher\/(.+)$/);
-            if(absencesMatch){
-                header.innerHTML = `
-                <a href="/">Система учета пропусков</a>
-                <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/" id="logout">Выход</a>
-                </nav>
-                `;
-            } else if(passesMatch){
+            const passesMatch = currentPath.match(/^\/passes-approved\/(.+)$/);
+            if(passesMatch){
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
                     <a href="/teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -345,8 +374,7 @@ const updateHeader = async () => {
                 header.innerHTML = `
                 <a href="/">Система учета пропусков</a>
                 <nav>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -355,8 +383,7 @@ const updateHeader = async () => {
                 <a href="/">Система учета пропусков</a>
                 <nav>
                     <a href="/teacher/${encodeURIComponent(user.email)}">Личный кабинет</a>
-                    <a href="/absences/${encodeURIComponent(user.email)}">Мои пропуски</a>
-                    <a href="/passes-teacher/${encodeURIComponent(user.email)}">Пропуски студентов</a>
+                    <a href="/passes-approved/${encodeURIComponent(user.email)}">Пропуски студентов</a>
                     <a href="/" id="logout">Выход</a>
                 </nav>
                 `;
@@ -425,14 +452,27 @@ const locationHandler = async () => {
     if (isAuthtorized && token !== null) {
         const userRoles = await fetchRoles();
         if(userRoles.isAdmin){
-            const adminMatch = location.match(/^\/admin\/(.+)$/);
-            if (adminMatch) {
-                const html = await fetch("/pages/admin.html").then(res => res.text());
+            const usersMatch = location.match(/^\/users\/(.+)$/);
+            if (usersMatch) {
+                const html = await fetch("/pages/users.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
-                document.title = "Админ | " + urlPageTitle;
+                document.title = "Пользователи | " + urlPageTitle;
                 try {
-                    await loadScript("js/admin.js");
+                    await loadScript("js/users.js");
                     console.log("Скрипт загружен.");
+                } catch (error) {
+                    console.error("Ошибка при загрузке скрипта", error);
+                }
+                await updateHeader();
+                return;
+            }
+            const passesApprovedMatch = location.match(/^\/passes-approved\/(.+)$/)
+            if (passesApprovedMatch) {
+                const html = await fetch("/pages/passes-approved.html").then(res => res.text());
+                document.getElementById("content").innerHTML = html;
+                document.title = "Принятые пропуски | " + urlPageTitle;
+                try {
+                    await loadScript("js/passes-approved.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
@@ -471,24 +511,24 @@ const locationHandler = async () => {
             }
             const teacherStudentMatch = location.match(/^\/teacher-student\/(.+)$/);
             if(teacherStudentMatch){
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
+                const html = await fetch("/pages/profile.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
                 document.title = "Личный кабинет | " + urlPageTitle;
                 try {
-                    await loadScript("js/teacher.js");
+                    await loadScript("js/profile.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
                 await updateHeader();
                 return;
             }
-            const passesMatch = location.match(/^\/passes-teacher\/(.+)$/);
-            if (passesMatch){
-                const html = await fetch("/pages/passes.html").then(res => res.text());
+            const passesApprovedMatch = location.match(/^\/passes-approved\/(.+)$/);
+            if (passesApprovedMatch){
+                const html = await fetch("/pages/passes-approved.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
                 document.title = "Пропуски студентов | " + urlPageTitle;
                 try {
-                    await loadScript("js/passes.js");
+                    await loadScript("js/passes-approved.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
@@ -498,11 +538,11 @@ const locationHandler = async () => {
         } else if(userRoles.isStudent){
             const studentMatch = location.match(/^\/student\/(.+)$/);
             if (studentMatch) {
-                const html = await fetch("/pages/student.html").then(res => res.text());
+                const html = await fetch("/pages/profile.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
                 document.title = "Личный кабинет | " + urlPageTitle;
                 try {
-                    await loadScript("js/student.js");
+                    await loadScript("js/profile.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
@@ -526,36 +566,33 @@ const locationHandler = async () => {
                 return;
             }
         } else if(userRoles.isDean && userRoles.isTeacher){
-            const absencesMatch = location.match(/^\/absences\/(.+)$/);
-            if(absencesMatch){
-                const html = await fetch("/pages/absences.html").then(res => res.text());
+            const passesApprovedMatch = location.match(/^\/passes-approved\/(.+)$/);
+            if (passesApprovedMatch){
+                const html = await fetch("/pages/passes-approved.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
-                document.title = "Мои пропуски | " + urlPageTitle;
-
+                document.title = "Принятые пропуски | " + urlPageTitle;
                 try {
-                    await loadScript("js/absences.js");
-                    console.log("Скрипт загружен.");
-                } catch (error) {
-                    console.error("Ошибка загрузки скрипта", error);
-                }
-
-                await updateHeader();
-                return;
-            }
-            const teacherDeanMatch = location.match(/^\/dean-teacher\/(.+)$/);
-            if (teacherDeanMatch) {
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Личный кабинет | " + urlPageTitle;
-                try {
-                    await loadScript("js/teacher.js");
+                    await loadScript("js/passes-approved.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
                 await updateHeader();
                 return;
             }
-            const passesMatch = location.match(/^\/passes-dean\/(.+)$/);
+            const teacherDeanMatch = location.match(/^\/dean-teacher\/(.+)$/);
+            if (teacherDeanMatch) {
+                const html = await fetch("/pages/profile.html").then(res => res.text());
+                document.getElementById("content").innerHTML = html;
+                document.title = "Личный кабинет | " + urlPageTitle;
+                try {
+                    await loadScript("js/profile.js");
+                } catch (error) {
+                    console.error("Ошибка при загрузке скрипта", error);
+                }
+                await updateHeader();
+                return;
+            }
+            const passesMatch = location.match(/^\/passes\/(.+)$/);
             if(passesMatch){
                 const html = await fetch("/pages/passes.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
@@ -568,13 +605,13 @@ const locationHandler = async () => {
                 await updateHeader();
                 return;
             }
-            const deanMatch = location.match(/^\/dean\/(.+)$/)
+            const deanMatch = location.match(/^\/users\/(.+)$/)
             if (deanMatch){
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
+                const html = await fetch("/pages/users.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
                 document.title = "Личный кабинет | " + urlPageTitle;
                 try {
-                    await loadScript("js/teacher.js");
+                    await loadScript("js/dean.js");
                     console.log("Скрипт загружен.");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
@@ -583,7 +620,7 @@ const locationHandler = async () => {
                 return;
             }
         } else if(userRoles.isDean){
-            const passesMatch = location.match(/^\/passes-dean\/(.+)$/)
+            const passesMatch = location.match(/^\/passes\/(.+)$/);
             if (passesMatch){
                 const html = await fetch("/pages/passes.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
@@ -596,43 +633,54 @@ const locationHandler = async () => {
                 await updateHeader();
                 return;
             }
-        } else if(userRoles.isTeacher){
-            const absencesMatch = location.match(/^\/absences\/(.+)$/);
-            if(absencesMatch){
-                const html = await fetch("/pages/absences.html").then(res => res.text());
+            const passesApprovedMatch = location.match(/^\/passes-approved\/(.+)$/);
+            if (passesApprovedMatch){
+                const html = await fetch("/pages/passes-approved.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
-                document.title = "Мои пропуски | " + urlPageTitle;
-
+                document.title = "Принятые пропуски | " + urlPageTitle;
                 try {
-                    await loadScript("js/absences.js");
-                    console.log("Скрипт загружен.");
-                } catch (error) {
-                    console.error("Ошибка загрузки скрипта", error);
-                }
-
-                await updateHeader();
-                return;
-            }
-            const teacherStudentMatch = location.match(/^\/teacher\/(.+)$/);
-            if(teacherStudentMatch){
-                const html = await fetch("/pages/teacher.html").then(res => res.text());
-                document.getElementById("content").innerHTML = html;
-                document.title = "Личный кабинет | " + urlPageTitle;
-                try {
-                    await loadScript("js/teacher.js");
+                    await loadScript("js/passes-approved.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }
                 await updateHeader();
                 return;
             }
-            const passesMatch = location.match(/^\/passes-teacher\/(.+)$/);
+            const deanMatch = location.match(/^\/users\/(.+)$/);
+            if (deanMatch){
+                const html = await fetch("/pages/users.html").then(res => res.text());
+                document.getElementById("content").innerHTML = html;
+                document.title = "Личный кабинет | " + urlPageTitle;
+                try {
+                    await loadScript("js/dean.js");
+                    console.log("Скрипт загружен.");
+                } catch (error) {
+                    console.error("Ошибка при загрузке скрипта", error);
+                }
+                await updateHeader();
+                return;
+            }
+        } else if(userRoles.isTeacher){
+            const teacherStudentMatch = location.match(/^\/teacher\/(.+)$/);
+            if(teacherStudentMatch){
+                const html = await fetch("/pages/profile.html").then(res => res.text());
+                document.getElementById("content").innerHTML = html;
+                document.title = "Личный кабинет | " + urlPageTitle;
+                try {
+                    await loadScript("js/profile.js");
+                } catch (error) {
+                    console.error("Ошибка при загрузке скрипта", error);
+                }
+                await updateHeader();
+                return;
+            }
+            const passesMatch = location.match(/^\/passes-approved\/(.+)$/);
             if(passesMatch) {
-                const html = await fetch("/pages/passes.html").then(res => res.text());
+                const html = await fetch("/pages/passes-approved.html").then(res => res.text());
                 document.getElementById("content").innerHTML = html;
                 document.title = "Пропуски студентов | " + urlPageTitle;
                 try {
-                    await loadScript("js/passes.js");
+                    await loadScript("js/passes-approved.js");
                 } catch (error) {
                     console.error("Ошибка при загрузке скрипта", error);
                 }

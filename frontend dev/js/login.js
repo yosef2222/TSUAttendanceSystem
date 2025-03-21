@@ -57,7 +57,7 @@ if (document.getElementById('loginForm')) {
             }
 
             if (roles.isAdmin) {
-                window.history.pushState({}, "", `/admin/${encodeURIComponent(email)}`);
+                window.history.pushState({}, "", `/users/${encodeURIComponent(email)}`);
             } else if (roles.isStudent && roles.isTeacher) {
                 window.history.pushState({}, "", `/teacher-student/${encodeURIComponent(email)}`);
             } else if (roles.isStudent) {
@@ -65,7 +65,7 @@ if (document.getElementById('loginForm')) {
             } else if (roles.isTeacher && roles.isDean) {
                 window.history.pushState({}, "", `/dean-teacher/${encodeURIComponent(email)}`);
             } else if (roles.isDean) {
-                window.history.pushState({}, "", `/dean/${encodeURIComponent(email)}`);
+                window.history.pushState({}, "", `/users/${encodeURIComponent(email)}`);
             } else if (roles.isTeacher) {
                 window.history.pushState({}, "", `/teacher/${encodeURIComponent(email)}`);
             }else {

@@ -1,9 +1,25 @@
 const tableBody = document.querySelector('#passesTable tbody');
 const jwtToken = localStorage.getItem('token'); 
 let passes = [];
+let userRoles = {}; 
+
+/*async function init() {
+    userRoles = await fetchRoles();
+    const takesElement = document.getElementById("takesTh");
+    if (userRoles.isAdmin || userRoles.isDean) {
+        takesElement.style.display = "block";
+    } else {
+        takesElement.style.display = "none";
+    }
+    fetchPendingRequests();
+}*/
+
+//init();
+fetchPendingRequests();
+
 async function fetchPendingRequests(groupNumber = "") {
     try {
-        let url = 'http://localhost:5163/api/Requests/pending';
+        let url = 'http://localhost:5163/api/Requests/approved';
         if (groupNumber.trim() !== "") {
             url += `?groupNumber=${encodeURIComponent(groupNumber)}`;
         }
@@ -28,6 +44,32 @@ async function fetchPendingRequests(groupNumber = "") {
     }
 }
 
+async function fetchRoles() {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("Токен авторизации отсутствует");
+            return null;
+        }
+
+        const response = await fetch("http://localhost:5163/User/roles", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Ошибка при получении ролей", error);
+        return null;
+    }
+}
+
 document.getElementById("searchGroupButton").addEventListener("click", function () {
     const groupValue = document.getElementById("searchGroupInput").value;
     fetchPendingRequests(groupValue);
@@ -35,7 +77,6 @@ document.getElementById("searchGroupButton").addEventListener("click", function 
 
 async function renderRequests(requests) {
     tableBody.innerHTML = '';
-
     for (const request of requests) {
         const row = document.createElement('tr');
 
@@ -46,7 +87,6 @@ async function renderRequests(requests) {
         const groupCell = document.createElement('td');
         groupCell.textContent = request.groupNumber;
         row.appendChild(groupCell);
-
 
         const reasonCell = document.createElement('td');
         reasonCell.textContent = request.reason || 'Причина не указана'; 
@@ -62,7 +102,7 @@ async function renderRequests(requests) {
         row.appendChild(endDateCell);
 
         const statusCell = document.createElement('td');
-        statusCell.textContent = request.status === "Pending" ? "На проверке" : request.status;
+        statusCell.textContent = request.status === "Approved" ? "Принято" : request.status;
         row.appendChild(statusCell);
 
         const fileLinks = request.fileIds && request.fileIds.length > 0 ? await fetchFileLinks(request.id, request.fileIds) : "Нет файлов";
@@ -70,37 +110,21 @@ async function renderRequests(requests) {
         const filesCell = document.createElement('td');
         filesCell.innerHTML = fileLinks; 
         row.appendChild(filesCell);
-
-        const actionsCell = document.createElement('td');
-
-        const acceptButton = document.createElement('button');
-        acceptButton.textContent = 'Принять';
-        acceptButton.addEventListener('click', () => {
-            reviewRequest(request.id, true); 
-        });
-
-        const rejectButton = document.createElement('button');
-        rejectButton.textContent = 'Отказать';
-        rejectButton.classList.add('delete');
-        rejectButton.addEventListener('click', () => {
+        
+        
+        /*if(userRoles.isDean || userRoles.isAdmin){
+            const actionsCell = document.createElement('td');
+            const rejectButton = document.createElement('button');
+            rejectButton.textContent = 'Отказать';
+            rejectButton.classList.add('delete');
+            rejectButton.addEventListener('click', () => {
             reviewRequest(request.id, false); 
-        });
-
-        actionsCell.appendChild(acceptButton);
-        actionsCell.appendChild(rejectButton);
-        row.appendChild(actionsCell);
-
+            });
+            actionsCell.appendChild(rejectButton);
+            row.appendChild(actionsCell);
+        }*/
         tableBody.appendChild(row);
     }
-}
-
-
-function formatDate(dateString) {
-    if (dateString === '0001-01-01T00:00:00') {
-        return 'Дата не указана';
-    }
-    const date = new Date(dateString);
-    return date.toLocaleString(); 
 }
 
 async function reviewRequest(requestId, approved) {
@@ -125,6 +149,14 @@ async function reviewRequest(requestId, approved) {
         console.error('Ошибка при отправке запроса:', error);
         alert('Не удалось отправить запрос');
     }
+}
+
+function formatDate(dateString) {
+    if (dateString === '0001-01-01T00:00:00') {
+        return 'Дата не указана';
+    }
+    const date = new Date(dateString);
+    return date.toLocaleString(); 
 }
 
 async function fetchFileLinks(requestId, fileIds) {
@@ -159,4 +191,3 @@ async function fetchFileLinks(requestId, fileIds) {
         return "Ошибка загрузки файлов";
     }
 }
-fetchPendingRequests();

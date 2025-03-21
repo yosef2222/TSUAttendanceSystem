@@ -1,8 +1,13 @@
 const tableBody = document.querySelector('#usersTable tbody');
 const jwtToken = localStorage.getItem('token'); 
 let users = [];
-function fetchUsers() {
-    fetch('http://localhost:5163/User/users', {
+function fetchUsers(fullName = "") {
+    let url = 'http://localhost:5163/User/users';
+    if (fullName.trim() !== "") {
+        url += `?fullName=${encodeURIComponent(fullName)}`;
+    }
+
+    fetch(url, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -11,7 +16,7 @@ function fetchUsers() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
+            throw new Error('Ошибка сети: ' + response.statusText);
         }
         return response.json();
     })
@@ -20,13 +25,12 @@ function fetchUsers() {
         displayUsers(users);
     })
     .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
+        console.error('Ошибка при загрузке пользователей:', error);
     });
 }
 
-// Функция для отображения пользователей в таблице
 function displayUsers(users) {
-    tableBody.innerHTML = ''; // Очистка таблицы перед добавлением новых данных
+    tableBody.innerHTML = '';
     users.forEach(user => {
         const row = document.createElement('tr');
 
@@ -46,38 +50,28 @@ function displayUsers(users) {
         const makeTeacherButton = document.createElement('button');
         makeTeacherButton.textContent = 'Сделать учителем';
         makeTeacherButton.addEventListener('click', () => {
-            updateUserRole(user.id, { isTeacher: true, isDean: false }, roleCell);
+            updateUserRole(user.id, { isTeacher: true, isDean: false });
         });
-
-        const makeDeanButton = document.createElement('button');
-        makeDeanButton.textContent = 'Сделать деканом';
-        makeDeanButton.addEventListener('click', () => {
-            updateUserRole(user.id, { isTeacher: false, isDean: true }, roleCell);
-        });
-
         actionsCell.appendChild(makeTeacherButton);
-        actionsCell.appendChild(makeDeanButton);
         row.appendChild(actionsCell);
 
         tableBody.appendChild(row);
     });
 }
 
-// Функция для получения названия роли
 function getRoleName(role) {
     if (role.isAdmin) return 'Администратор';
-    if (role.isDean) return 'Декан';
-    if (role.isTeacher) return 'Преподаватель';
-    if (role.isStudent) return 'Студент';
-    return 'Неизвестно';
+    else if (role.isTeacher && role.isStudent) return 'Преподаватель-Студент'
+    else if (role.isStudent) return 'Студент';
+    else if (role.isDean && role.isTeacher) return 'Деканат-преподаватель';
+    else if (role.isDean) return 'Деканат';
+    else if (role.isTeacher) return 'Преподаватель';
+    else return 'Неизвестно';
 }
 
-// Функция для обновления роли пользователя
-function updateUserRole(userId, newRole, roleCell) {
+function updateUserRole(userId, newRole) {
     let endpoint = '';
-    if (newRole.isDean) {
-        endpoint = `http://localhost:5163/api/Roles/grant-dean/${userId}`;
-    } else if (newRole.isTeacher) {
+    if (newRole.isTeacher) {
         endpoint = `http://localhost:5163/api/Roles/grant-teacher/${userId}`;
     } else {
         console.error('Некорректная роль');
@@ -98,13 +92,17 @@ function updateUserRole(userId, newRole, roleCell) {
         return response.json();
     })
     .then(data => {
-        // Обновляем роль в таблице
-        roleCell.textContent = getRoleName(newRole);
         console.log('Роль успешно обновлена:', data);
+        fetchUsers();
     })
     .catch(error => {
         console.error('Ошибка при обновлении роли:', error);
     });
 }
 
-fetchUsers(); // Вызов функции для получения и отображения пользователей при загрузке страницы
+document.getElementById("searchButton").addEventListener("click", function () {
+    const searchValue = document.getElementById("searchInput").value;
+    fetchUsers(searchValue); 
+});
+
+fetchUsers(); 

@@ -63,24 +63,36 @@ async function renderTable() {
     for (const [index, absence] of absences.entries()) {
         const dateStart = absence.absenceDateStart ? formatDateTime(absence.absenceDateStart) : "-";
         const dateEnd = absence.absenceDateEnd ? formatDateTime(absence.absenceDateEnd) : "-";
-
+        let status = "На проверке"
+        if(absence.status === "Approved") status = "Принято";
+        if(absence.status === "Rejected") status = "Отклонено";
         let fileLinks = "Нет файлов";
         if (absence.fileIds && absence.fileIds.length > 0) {
             fileLinks = await fetchFileLinks(absence.id, absence.fileIds);
         }
 
         const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${absence.reason}</td>
-            <td>${absence.status}</td>
-            <td>${dateStart}</td>  
-            <td>${dateEnd}</td>  
-            <td>${fileLinks}</td>
-            <td>
-                <button onclick="editAbsence(${index})">Редактировать</button>
-            </td>
-        `;
-
+        if(absence.status === "Approved" || absence.status === "Rejected") {
+            row.innerHTML = `
+                <td>${absence.reason}</td>
+                <td>${status}</td>
+                <td>${dateStart}</td>  
+                <td>${dateEnd}</td>  
+                <td>${fileLinks}</td>
+                <td>Нет действий</td>
+            `;
+        }else {
+            row.innerHTML = `
+                <td>${absence.reason}</td>
+                <td>${status}</td>
+                <td>${dateStart}</td>  
+                <td>${dateEnd}</td>  
+                <td>${fileLinks}</td>
+                <td>
+                    <button onclick="editAbsence(${index})">Редактировать</button>
+                </td>
+            `;
+        }
         tbody.appendChild(row);
     }
 }
@@ -190,7 +202,7 @@ form.addEventListener("submit", async function (e) {
             return;
         }
 
-        let url = "http://localhost:5163/api/Requests";
+        let url = "http://localhost:5163/api/Requests/create";
         let method = "POST";
 
         if (editingIndex !== null) {
